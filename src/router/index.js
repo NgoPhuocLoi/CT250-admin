@@ -1,15 +1,13 @@
-import AppVue from "@/App.vue";
 import { createRouter, createWebHistory } from "vue-router";
-
+import DefaultLayout from "@/layouts/DefaultLayout.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: "/",
       name: "",
-      component: AppVue,
+      component: DefaultLayout,
     },
-    {},
   ],
 });
 
