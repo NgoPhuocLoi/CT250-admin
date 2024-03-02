@@ -1,5 +1,6 @@
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
-import CategoriesViewVue from "@/views/category/CategoriesView.vue";
+import CategoriesView from "@/views/category/CategoriesView.vue";
+import ProductsView from "@/views/product/ProductsView.vue";
 import { createRouter, createWebHistory } from "vue-router";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,7 +12,11 @@ const router = createRouter({
       children: [
         {
           path: "danh-muc-san-pham",
-          component: CategoriesViewVue,
+          component: CategoriesView,
+        },
+        {
+          path: "san-pham",
+          component: ProductsView,
         },
       ],
     },
