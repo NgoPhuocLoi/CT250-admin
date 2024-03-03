@@ -11,6 +11,9 @@
 }
 
 @layer components {
+  .btn-basic {
+    @apply text-center py-3 rounded bg-blue-500 text-white hover:opacity-85;
+  }
 }
 
 @layer utilities {
