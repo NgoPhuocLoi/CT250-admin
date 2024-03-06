@@ -85,31 +85,35 @@ const handleCreateProduct = async () => {
   const product = await productService.create({ ...newProduct.value, uploadedImageIds: uploadedProductImageIds });
   console.log(product.metadata);
 
-  // variantImage, thumbnailImage = await uploadImage
-  const uploadedVariantImageIds = await handleUploadVariantImages(newVariant.value);
+  await Promise.all(
+    variants.value.map(async (variant) => {
+      // variantImage, thumbnailImage = await uploadImage
+      const uploadedVariantImageIds = await handleUploadVariantImages(variant);
 
-  // them variantImage, thumbnailImage vo product_images
-  const productImageId = await productService.uploadImage(product.metadata.id, { uploadedImageId: uploadedVariantImageIds[0] });
-  const thumbnailImageId = await productService.uploadImage(product.metadata.id, { uploadedImageId: uploadedVariantImageIds[1] });
+      // them variantImage, thumbnailImage vo product_images
+      const productImageId = await productService.uploadImage(product.metadata.id, { uploadedImageId: uploadedVariantImageIds[0] });
+      const thumbnailImageId = await productService.uploadImage(product.metadata.id, { uploadedImageId: uploadedVariantImageIds[1] });
 
-  // create color
-  const color = await colorService.create({
-    name: newVariant.value.colorName,
-    productId: product.metadata.id,
-    productImageId: productImageId.metadata.id,
-    thumbnailImageId: thumbnailImageId.metadata.id,
-  })
-  console.log("color", color.metadata);
+      // create color
+      const color = await colorService.create({
+        name: variant.colorName,
+        productId: product.metadata.id,
+        productImageId: productImageId.metadata.id,
+        thumbnailImageId: thumbnailImageId.metadata.id,
+      })
+      console.log("color", color.metadata);
 
-  // variant = await createVariant
-  const variant = await productService.createVariant(product.metadata.id, {
-    productId: product.metadata.id,
-    colorId: color.metadata.id,
-    sizeId: newVariant.value.size.id,
-    quantity: newVariant.value.quantity,
-  });
+      // variant = await createVariant
+      const createdVariant = await productService.createVariant(product.metadata.id, {
+        productId: product.metadata.id,
+        colorId: color.metadata.id,
+        sizeId: variant.size.id,
+        quantity: variant.quantity,
+      });
 
-  console.log("variant", variant.metadata);
+      console.log("variant", createdVariant.metadata);
+    })
+  );
 
 
 };
@@ -153,19 +157,19 @@ const addNewVariant = () => {
 }
 
 const productSchema = yup.object().shape({
-  productName: yup
-    .string()
-    .required("Không được để trống tên sản phẩm.")
-    .max(50, "Tên sản phẩm tối đa 50 ký tự."),
-  price: yup
-    .number()
-    .required("Không được để trống giá."),
-  colorName: yup
-    .string()
-    .required("Không được để trống tên màu."),
-  quantity: yup
-    .number()
-    .required("Không được để trống số lượng."),
+  // productName: yup
+  //   .string()
+  //   .required("Không được để trống tên sản phẩm.")
+  //   .max(50, "Tên sản phẩm tối đa 50 ký tự."),
+  // price: yup
+  //   .number()
+  //   .required("Không được để trống giá."),
+  // colorName: yup
+  //   .string()
+  //   .required("Không được để trống tên màu."),
+  // quantity: yup
+  //   .number()
+  //   .required("Không được để trống số lượng."),
 });
 
 </script>
@@ -183,7 +187,7 @@ const productSchema = yup.object().shape({
           <!-- product name begin -->
           <div class="flex flex-col gap-2">
             <label for="productName" class="text-xl font-bold text-black">Tên sản phẩm</label>
-            <Field name="productName" id="productName" type="text" v-model="newProduct.name"
+            <input name="productName" id="productName" type="text" v-model="newProduct.name"
               class="w-full h-[55px] border mt-2 p-3 text-md text-gray-600 border-gray-400 rounded"
               placeholder="Nhập tên sản phẩm..." />
             <ErrorMessage name="productName" class="text-[15px] text-danger" />
@@ -216,7 +220,7 @@ const productSchema = yup.object().shape({
           <!-- price begin -->
           <div class="flex flex-col gap-2">
             <label for="price" class="text-xl font-bold text-black">Giá</label>
-            <Field name="price" id="price" type="number" v-model="newProduct.price"
+            <input name="price" id="price" type="number" v-model="newProduct.price"
               class="w-full h-[55px] border mt-2 p-3 text-md text-gray-600 border-gray-400 rounded"
               placeholder="Nhập giá sản phẩm..." />
             <ErrorMessage name="price" class="text-[15px] text-danger" />
@@ -298,15 +302,15 @@ const productSchema = yup.object().shape({
       </h5>
 
       <!-- list of variant begin -->
-      <div v-for="(variant, index) in variants" :key="index"
-        class="bg-blue-100 w-[90%] flex flex-col gap-8 border rounded p-6">
+      <div v-for="variant in variants" :key="variant"
+        class="bg-blue-100 w-[90%] flex flex-col gap-8 border rounded p-6 mb-6">
         <!-- size begin -->
         <div class="flex items-center gap-10">
           <div class="text-xl font-bold text-black">
             Kích cỡ:
           </div>
           <div class="flex flex-wrap gap-2">
-            <button @click.prevent="newVariant.size = size" v-for="size in sizes" :key="size.name" :class="[
+            <button v-for="size in sizes" :key="size.name" :class="[
     variant.size?.id == size.id
       ? 'border-[2px] border-blue-500'
       : 'border-[0.5px]',
@@ -324,21 +328,19 @@ const productSchema = yup.object().shape({
           </div>
           <div class="flex w-[80%] justify-between">
             <div class="flex flex-col justify-center gap-2">
-              <label for="colorName" class="text-xl text-black">Tên màu</label>
-              <Field id="colorName" type="text"
-                class="mb-2 w-full h-[55px] border p-3 text-md text-gray-600 border-gray-400 rounded"
-                placeholder="Nhập tên màu..." />
-              <!-- <ErrorMessage name="colorName" class="-mt-2 text-[15px] text-danger" /> -->
+              <label class="text-xl text-black">Tên màu</label>
+              <input type="text" class="mb-2 w-full h-[55px] border p-3 text-md text-gray-600 border-gray-400 rounded"
+                v-model="variant.colorName" placeholder="Nhập tên màu..." />
             </div>
             <div class="flex flex-col gap-2">
               <label class="text-xl text-black">Ảnh variant</label>
               <div
                 class="relative w-[200px] h-[200px] flex items-center justify-center border-2 border-dashed border-slate-300">
-                <img v-if="variant.image" class="w-[200px] h-[200px] object-contain" :src="variant.image.path" />
-                <div @click="uploadImage('variantImage1')" class="cursor-pointer">
-                  <ImageIcon :class="variant.image ? 'absolute top-2 right-2' : ''" />
+                <img class="w-[200px] h-[200px] object-contain" :src="variant.image.path" />
+                <div class="cursor-pointer">
+                  <ImageIcon class="absolute top-2 right-2" />
                   <div class="absolute top-0 left-0 invisible">
-                    <input accept="image/*" type="file" id="variantImage1" @change="addVariantImage" />
+                    <input accept="image/*" type="file" />
                   </div>
                 </div>
               </div>
@@ -347,12 +349,11 @@ const productSchema = yup.object().shape({
               <label class="text-xl text-black">Thumbnail</label>
               <div
                 class="relative w-[200px] h-[200px] flex items-center justify-center border-2 border-dashed border-slate-300">
-                <img v-if="variant.thumbnail" class="w-[200px] h-[200px] object-contain"
-                  :src="variant.thumbnail.path" />
-                <div @click="uploadImage('variantThumbnail1')" class="cursor-pointer">
-                  <ImageIcon :class="newVariant.thumbnail ? 'absolute top-2 right-2' : ''" />
+                <img class="w-[200px] h-[200px] object-contain" :src="variant.thumbnail.path" />
+                <div class="cursor-pointer">
+                  <ImageIcon class="absolute top-2 right-2" />
                   <div class="absolute top-0 left-0 invisible">
-                    <input accept="image/*" type="file" id="variantThumbnail1" @change="addVariantThumbnail" />
+                    <input accept="image/*" type="file" />
                   </div>
                 </div>
               </div>
@@ -365,10 +366,9 @@ const productSchema = yup.object().shape({
         <div class="flex items-center gap-8">
           <label for="quantity" class="text-xl font-bold text-black">Số lượng:</label>
           <div class="flex flex-col gap-2">
-            <Field id="quantity" type="number" v-model="variant.quantity"
+            <input id="quantity" type="number" v-model="variant.quantity"
               class="h-[55px] border mt-2 p-3 text-md text-gray-600 border-gray-400 rounded"
               placeholder="Nhập số lượng..." />
-            <!-- <ErrorMessage name="quantity" class="text-[15px] text-danger" /> -->
           </div>
         </div>
         <!-- quantity end -->
@@ -402,10 +402,10 @@ const productSchema = yup.object().shape({
           <div class="flex w-[80%] justify-between">
             <div class="flex flex-col justify-center gap-2">
               <label for="colorName" class="text-xl text-black">Tên màu</label>
-              <Field name="colorName" id="colorName" type="text"
+              <input name="colorName" id="colorName" type="text"
                 class="mb-2 w-full h-[55px] border p-3 text-md text-gray-600 border-gray-400 rounded"
                 v-model="newVariant.colorName" placeholder="Nhập tên màu..." />
-              <ErrorMessage name="colorName" class="-mt-2 text-[15px] text-danger" />
+              <!-- <ErrorMessage name="colorName" class="-mt-2 text-[15px] text-danger" /> -->
             </div>
             <div class="flex flex-col gap-2">
               <label class="text-xl text-black">Ảnh variant</label>
@@ -442,17 +442,17 @@ const productSchema = yup.object().shape({
         <div class="flex items-center gap-8">
           <label for="quantity" class="text-xl font-bold text-black">Số lượng:</label>
           <div class="flex flex-col gap-2">
-            <Field name="quantity" id="quantity" type="number" v-model="newVariant.quantity"
+            <input name="quantity" id="quantity" type="number" v-model="newVariant.quantity"
               class="h-[55px] border mt-2 p-3 text-md text-gray-600 border-gray-400 rounded"
               placeholder="Nhập số lượng..." />
-            <ErrorMessage name="quantity" class="text-[15px] text-danger" />
+            <!-- <ErrorMessage name="quantity" class="text-[15px] text-danger" /> -->
           </div>
         </div>
         <!-- quantity end -->
 
         <!-- button begin -->
         <div class="flex justify-end">
-          <button @click="addNewVariant" class="flex gap-2 border px-3 py-2 rounded hover:bg-blue-100">
+          <button @click.prevent="addNewVariant" class="flex gap-2 border px-3 py-2 rounded hover:bg-blue-100">
             <ExpandIcon />
             Thêm variant
           </button>
