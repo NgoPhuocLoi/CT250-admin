@@ -3,10 +3,14 @@ import moment from "moment";
 import orderService from "@/services/order";
 import paymentService from "@/services/payment";
 import { onMounted, ref } from "vue";
+import { ORDER_STATUS_ID_MAPPING } from "../constant/orderStatus";
+import { PAYMENT_STATUS_ID_MAPPING } from "../constant/paymentStatus";
 
 const props = defineProps(["orders"]);
 const orderStatuses = ref([]);
 const paymentStatuses = ref([]);
+
+const color = ref("green");
 
 onMounted(async () => {
   await Promise.all([fetchAllOrderStatuses(), fetAllPaymentStatuses()]);
@@ -104,7 +108,7 @@ async function fetAllPaymentStatuses() {
         </select>
       </div>
       <div class="col-span-4 flex flex-col items-center justify-center gap-2">
-        <p class="font-medium">Giá (VND)</p>
+        <p class="font-medium">Tổng tiền</p>
         <div class="flex gap-1 px-1">
           <input
             type="text"
@@ -158,10 +162,38 @@ async function fetAllPaymentStatuses() {
 
         <div class="col-span-3 flex">
           <div
-            class="flex items-center gap-[10px] ml-4 py-1 px-2 rounded-full bg-orange-300"
+            class="flex items-center gap-[10px] mx-auto py-1 px-2 rounded-full"
+            :class="{
+              'bg-orange-300':
+                order.currentStatusId ===
+                ORDER_STATUS_ID_MAPPING.AWAITING_CONFIRM,
+              'bg-orange-200':
+                order.currentStatusId ===
+                ORDER_STATUS_ID_MAPPING.AWAITING_FULFILLMENT,
+              'bg-green-200':
+                order.currentStatusId === ORDER_STATUS_ID_MAPPING.DELIVERING,
+              'bg-green-300':
+                order.currentStatusId === ORDER_STATUS_ID_MAPPING.DELIVERED,
+              'bg-red-300':
+                order.currentStatusId === ORDER_STATUS_ID_MAPPING.CANCELED,
+            }"
           >
             <div
-              class="w-[12px] h-[12px] border-[3px] border-orange-500 border-gray-600 bg-transparent rounded-full"
+              class="w-[12px] h-[12px] border-[3px] bg-transparent rounded-full"
+              :class="{
+                'border-orange-400':
+                  order.currentStatusId ===
+                  ORDER_STATUS_ID_MAPPING.AWAITING_CONFIRM,
+                'border-orange-500':
+                  order.currentStatusId ===
+                  ORDER_STATUS_ID_MAPPING.AWAITING_FULFILLMENT,
+                'border-green-500':
+                  order.currentStatusId === ORDER_STATUS_ID_MAPPING.DELIVERING,
+                'border-green-500':
+                  order.currentStatusId === ORDER_STATUS_ID_MAPPING.DELIVERED,
+                'border-red-500':
+                  order.currentStatusId === ORDER_STATUS_ID_MAPPING.CANCELED,
+              }"
             ></div>
             <p class="text-sm font-medium text-black">
               {{ order.currentStatus.name }}
@@ -170,9 +202,38 @@ async function fetAllPaymentStatuses() {
         </div>
 
         <div class="col-span-3 flex">
-          <p class="text-sm font-medium text-black ml-7">
-            {{ order.Payment.paymentStatus.name }}
-          </p>
+          <div
+            class="flex items-center gap-[10px] mx-auto py-1 px-2 rounded-full"
+            :class="{
+              'bg-orange-300':
+                order.Payment.paymentStatus.id ===
+                PAYMENT_STATUS_ID_MAPPING.PENDING,
+              'bg-green-300':
+                order.Payment.paymentStatus.id ===
+                PAYMENT_STATUS_ID_MAPPING.SUCCESS,
+              'bg-red-400':
+                order.Payment.paymentStatus.id ===
+                PAYMENT_STATUS_ID_MAPPING.FAILED,
+            }"
+          >
+            <div
+              class="w-[12px] h-[12px] border-[3px] bg-transparent rounded-full"
+              :class="{
+                'border-orange-500':
+                  order.Payment.paymentStatus.id ===
+                  PAYMENT_STATUS_ID_MAPPING.PENDING,
+                'border-green-500':
+                  order.Payment.paymentStatus.id ===
+                  PAYMENT_STATUS_ID_MAPPING.SUCCESS,
+                'border-red-500':
+                  order.Payment.paymentStatus.id ===
+                  PAYMENT_STATUS_ID_MAPPING.FAILED,
+              }"
+            ></div>
+            <p class="text-sm font-medium text-black">
+              {{ order.Payment.paymentStatus.name }}
+            </p>
+          </div>
         </div>
 
         <div class="col-span-4 flex">
