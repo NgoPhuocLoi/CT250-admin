@@ -4,7 +4,7 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
-    "./node_modules/tw-elements/dist/js/**/*.js",
+    "./node_modules/tw-elements/js/**/*.js",
   ],
   theme: {
     fontFamily: {
@@ -312,5 +312,5 @@ export default {
       },
     },
   },
-  plugins: [require("tw-elements/dist/plugin")],
+  plugins: [require("tw-elements/plugin.cjs")],
 };

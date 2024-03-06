@@ -1,12 +1,20 @@
 import createApiClient from "./api";
 
 class UploadService {
-  constructor(baseUrl = "/api/upload") {
-    this.api = createApiClient(baseUrl);
+  constructor() {
+    this.api = createApiClient("/api/upload");
   }
 
-  async uploadImage(data) {
-    return (await this.api.post("/image", data)).data;
+  async uploadImage(formData) {
+    return (await this.api.post("/image", formData)).data;
+  }
+
+  async uploadImages(formData) {
+    return (await this.api.post("/images", formData)).data;
+  }
+
+  async destroyImage(uploadedImageId) {
+    return (await this.api.delete("/" + uploadedImageId)).data;
   }
 }
 
