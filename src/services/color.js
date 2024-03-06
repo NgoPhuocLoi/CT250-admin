@@ -8,6 +8,10 @@ class ColorService {
   // async getAll(data) {
   //   return (await this.api.get("/")).data;
   // }
+
+  async create(data) {
+    return (await this.api.post("/", data)).data; // name, productId, thumbnailImageId, productImageId
+  }
 }
 
 export default new ColorService();
