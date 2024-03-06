@@ -2,6 +2,7 @@ import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import CategoriesView from "@/views/category/CategoriesView.vue";
 import ProductsView from "@/views/product/ProductsView.vue";
 import OrdersView from "@/views/order/OrdersView.vue";
+import OrderDetailView from "@/views/order/OrderDetailView.vue";
 import AddProductView from "@/views/product/AddProductView.vue";
 
 import { createRouter, createWebHistory } from "vue-router";
@@ -28,6 +29,10 @@ const router = createRouter({
         {
           path: "don-hang",
           component: OrdersView,
+        },
+        {
+          path: "don-hang/:orderId",
+          component: OrderDetailView,
         },
       ],
     },

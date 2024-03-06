@@ -10,8 +10,6 @@ const props = defineProps(["orders"]);
 const orderStatuses = ref([]);
 const paymentStatuses = ref([]);
 
-const color = ref("green");
-
 onMounted(async () => {
   await Promise.all([fetchAllOrderStatuses(), fetAllPaymentStatuses()]);
 });
@@ -142,9 +140,12 @@ async function fetAllPaymentStatuses() {
                 >checkbox</label
               >
             </div>
-            <p class="text-sm font-medium text-black mx-auto">
+            <RouterLink
+              :to="`/don-hang/${order.id}`"
+              class="text-sm font-bold underline-offset-2 underline text-black mx-auto"
+            >
               #{{ order.id }}
-            </p>
+            </RouterLink>
           </div>
         </div>
 
