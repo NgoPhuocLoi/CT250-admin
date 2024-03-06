@@ -5,6 +5,20 @@ class ProductService {
     this.api = createApiClient(baseUrl);
   }
 
+  async create(data) {
+    return (await this.api.post("/", data)).data; // name, price, description, material, overview, instruction, categoryId, (array) uploadedImageIds  
+  }
+
+  // /products/:productId/variants
+
+  async createVariant(id, data) {
+    return (await this.api.post(`/${id}/variants`, data)).data; // quantity, colorId, sizeId, productId
+  }
+
+  async uploadImage(id, data) {
+    return (await this.api.post(`/${id}/add-image`, data)).data; // name, price, description, material, overview, instruction, categoryId, (array) uploadedImageIds  
+  }
+
   async getAll() {
     return await this.getByType("All");
   }
