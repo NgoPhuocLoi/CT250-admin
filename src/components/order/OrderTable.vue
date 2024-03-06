@@ -5,6 +5,8 @@ import paymentService from "@/services/payment";
 import { onMounted, ref } from "vue";
 import { ORDER_STATUS_ID_MAPPING } from "../constant/orderStatus";
 import { PAYMENT_STATUS_ID_MAPPING } from "../constant/paymentStatus";
+import OrderStatus from "./OrderStatus.vue";
+import PaymentStatus from "./PaymentStatus.vue";
 
 const props = defineProps(["orders"]);
 const orderStatuses = ref([]);
@@ -162,79 +164,11 @@ async function fetAllPaymentStatuses() {
         </div>
 
         <div class="col-span-3 flex">
-          <div
-            class="flex items-center gap-[10px] mx-auto py-1 px-2 rounded-full"
-            :class="{
-              'bg-orange-300':
-                order.currentStatusId ===
-                ORDER_STATUS_ID_MAPPING.AWAITING_CONFIRM,
-              'bg-orange-200':
-                order.currentStatusId ===
-                ORDER_STATUS_ID_MAPPING.AWAITING_FULFILLMENT,
-              'bg-green-200':
-                order.currentStatusId === ORDER_STATUS_ID_MAPPING.DELIVERING,
-              'bg-green-300':
-                order.currentStatusId === ORDER_STATUS_ID_MAPPING.DELIVERED,
-              'bg-red-300':
-                order.currentStatusId === ORDER_STATUS_ID_MAPPING.CANCELED,
-            }"
-          >
-            <div
-              class="w-[12px] h-[12px] border-[3px] bg-transparent rounded-full"
-              :class="{
-                'border-orange-400':
-                  order.currentStatusId ===
-                  ORDER_STATUS_ID_MAPPING.AWAITING_CONFIRM,
-                'border-orange-500':
-                  order.currentStatusId ===
-                  ORDER_STATUS_ID_MAPPING.AWAITING_FULFILLMENT,
-                'border-green-500':
-                  order.currentStatusId === ORDER_STATUS_ID_MAPPING.DELIVERING,
-                'border-green-500':
-                  order.currentStatusId === ORDER_STATUS_ID_MAPPING.DELIVERED,
-                'border-red-500':
-                  order.currentStatusId === ORDER_STATUS_ID_MAPPING.CANCELED,
-              }"
-            ></div>
-            <p class="text-sm font-medium text-black">
-              {{ order.currentStatus.name }}
-            </p>
-          </div>
+          <OrderStatus :order-status="order.currentStatus" />
         </div>
 
         <div class="col-span-3 flex">
-          <div
-            class="flex items-center gap-[10px] mx-auto py-1 px-2 rounded-full"
-            :class="{
-              'bg-orange-300':
-                order.Payment.paymentStatus.id ===
-                PAYMENT_STATUS_ID_MAPPING.PENDING,
-              'bg-green-300':
-                order.Payment.paymentStatus.id ===
-                PAYMENT_STATUS_ID_MAPPING.SUCCESS,
-              'bg-red-400':
-                order.Payment.paymentStatus.id ===
-                PAYMENT_STATUS_ID_MAPPING.FAILED,
-            }"
-          >
-            <div
-              class="w-[12px] h-[12px] border-[3px] bg-transparent rounded-full"
-              :class="{
-                'border-orange-500':
-                  order.Payment.paymentStatus.id ===
-                  PAYMENT_STATUS_ID_MAPPING.PENDING,
-                'border-green-500':
-                  order.Payment.paymentStatus.id ===
-                  PAYMENT_STATUS_ID_MAPPING.SUCCESS,
-                'border-red-500':
-                  order.Payment.paymentStatus.id ===
-                  PAYMENT_STATUS_ID_MAPPING.FAILED,
-              }"
-            ></div>
-            <p class="text-sm font-medium text-black">
-              {{ order.Payment.paymentStatus.name }}
-            </p>
-          </div>
+          <PaymentStatus :payment-status="order.Payment.paymentStatus" />
         </div>
 
         <div class="col-span-4 flex">

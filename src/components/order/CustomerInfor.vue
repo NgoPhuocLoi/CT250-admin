@@ -1,15 +1,17 @@
-<script setup></script>
+<script setup>
+const props = defineProps(["customer", "deliveryAddress"]);
+</script>
 <template>
   <div class="p-4 border-b border-[#ccc]">
     <div class="text-black text-[20px] font-bold">Khách hàng</div>
     <div class="pt-4">
       <div class="flex">
         <span class="w-[110px] block text-black">Tên: </span>
-        <p>Ngô Phước Lợi</p>
+        <p>{{ props.customer?.fullName }}</p>
       </div>
       <div class="flex">
         <span class="w-[110px] block text-black">Email:</span>
-        <p>phuocloi11223@gmail.com</p>
+        <p>{{ props.customer?.email }}</p>
       </div>
     </div>
   </div>
@@ -19,7 +21,7 @@
     <div class="pt-4">
       <div class="flex">
         <span class="w-[110px] block text-black">Điện thoại: </span>
-        <p>0796863758</p>
+        <p>{{ props.customer?.phone }}</p>
       </div>
     </div>
   </div>
@@ -29,18 +31,22 @@
     <div class="pt-4">
       <div class="flex">
         <span class="w-[110px] block text-black">Người nhận: </span>
-        <p>Ngô Phước Lợi</p>
+        <p>{{ props.deliveryAddress?.contactName }}</p>
       </div>
 
       <div class="flex">
         <span class="w-[110px] block text-black">Điện thoại: </span>
-        <p>0796863758</p>
+        <p>{{ props.deliveryAddress?.contactPhone }}</p>
       </div>
 
       <div class="flex">
         <span class="min-w-[110px] block text-black">Địa chỉ: </span>
         <p class="text-wrap">
-          ABC, phường Thới Long, quận Ô Môn, thành phố Cần Thơ
+          {{ props.deliveryAddress?.detailAddress }}
+          <span v-if="props.deliveryAddress?.detailAddress">,</span>
+          {{ props.deliveryAddress?.wardName }},
+          {{ props.deliveryAddress?.districtName }},
+          {{ props.deliveryAddress?.provinceName }}
         </p>
       </div>
     </div>

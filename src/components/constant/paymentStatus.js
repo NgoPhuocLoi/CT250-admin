@@ -9,9 +9,3 @@ export const PAYMENT_STATUS_ID_MAPPING = {
   SUCCESS: 2,
   FAILED: 3,
 };
-
-export const PAYMENT_STATUS_COLOR_MAPPING = {
-  1: "orange",
-  2: "green",
-  3: "red",
-};

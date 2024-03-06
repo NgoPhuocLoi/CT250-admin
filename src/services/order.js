@@ -6,7 +6,7 @@ class OrderService {
   }
 
   async getAll(filter) {
-    return (await this.api.get("/")).data;
+    return (await this.api.get("/all")).data;
   }
 
   async getAllOrderStatus() {
@@ -19,6 +19,11 @@ class OrderService {
 
   async getOrderById(orderId) {
     return (await this.api.get("/" + orderId)).data;
+  }
+
+  async updateOrderStatus(orderId, { fromStatus, toStatus }) {
+    return (await this.api.put(`/${orderId}/status`, { fromStatus, toStatus }))
+      .data;
   }
 }
 

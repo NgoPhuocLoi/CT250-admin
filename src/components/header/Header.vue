@@ -10,14 +10,6 @@ import DropdownUser from "./DropdownUser.vue";
     <div
       class="flex flex-grow items-center justify-between py-4 px-4 shadow-2 md:px-6 2xl:px-11"
     >
-      <div class="flex items-center gap-2 sm:gap-4 lg:hidden">
-        <!-- Hamburger Toggle BTN -->
-
-        <!-- Hamburger Toggle BTN -->
-        <router-link class="block flex-shrink-0 lg:hidden" to="/">
-          <!-- <img src="@/assets/images/logo/logo-icon.svg" alt="Logo" /> -->
-        </router-link>
-      </div>
       <div class="hidden sm:block">
         <form action="https://formbold.com/s/unique_form_id" method="POST">
           <div class="relative">
