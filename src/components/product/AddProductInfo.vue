@@ -5,31 +5,20 @@ import * as yup from "yup";
 import { Form, Field, ErrorMessage } from "vee-validate";
 
 import ImageIcon from "@/components/icons/ImageIcon.vue";
+import EditIcon from "@/components/icons/EditIcon.vue";
 import DeleteIcon from "@/components/icons/DeleteIcon.vue";
-import ExpandIcon from "@/components/icons/ExpandIcon.vue";
-import Spinner from "@/components/common/Spinner.vue";
-import AddProductInfo from "@/components/product/AddProductInfo.vue";
-import VariantList from "@/components/product/VariantList.vue";
-import AddVariantModal from "@/components/product/AddVariantModal.vue";
 
 import categoryService from "@/services/category";
 import sizeService from "@/services/size";
-import colorService from "@/services/color";
-import uploadService from "@/services/upload";
-import productService from "@/services/product";
 
-import { useCategoryStore, useSizeStore } from "@/stores";
-import { useRouter } from "vue-router";
+import { useCategoryStore, useSizeStore, useProductStore } from "@/stores";
+
 const categoryStore = useCategoryStore();
 const sizeStore = useSizeStore();
-const router = useRouter();
+const productStore = useProductStore();
 
 const editor = ClassicEditor;
-const newProduct = ref({ visible: true });
 const parentCategory = ref({});
-
-const images = ref([]);
-const loading = ref(false);
 
 onMounted(async () => {
     try {
@@ -43,110 +32,14 @@ onMounted(async () => {
     }
 });
 
-const uploadImage = (elementId) => {
-    document.getElementById(elementId).click();
-};
-
 const addProductImage = (e) => {
-    const files = e.target.files;
-    images.value.push({
-        file: files[0],
-        path: URL.createObjectURL(files[0]),
-    });
+    productStore.addProductImage(e);
 };
 
 const removeProductImage = (imageIndex) => {
-    images.value.splice(imageIndex, 1);
+    productStore.removeProductImage(imageIndex);
 };
 
-const handleCreateProduct = async () => {
-    // images = await uploadedImages
-    const uploadedProductImageIds = await handleUploadProductImages();
-
-    // product = await createProduct
-    const product = await productService.create({
-        ...newProduct.value,
-        uploadedImageIds: uploadedProductImageIds,
-    });
-
-    await Promise.all(
-        variantStore.variants.map(async (variant) => {
-            // variantImage, thumbnailImage = await uploadImage
-            const uploadedVariantImageIds = await handleUploadVariantImages(variant);
-
-            // them variantImage, thumbnailImage vo product_images
-            const productImageId = await productService.uploadImage(
-                product.metadata.id,
-                { uploadedImageId: uploadedVariantImageIds[0] }
-            );
-
-            // create color
-            const color = await colorService.create({
-                name: variant.colorName,
-                productId: product.metadata.id,
-                productImageId: productImageId.metadata.id,
-                thumbnailImageId: uploadedVariantImageIds[1],
-            });
-
-            // variant = await createVariant
-            const createdVariant = await productService.createVariant(
-                product.metadata.id,
-                {
-                    productId: product.metadata.id,
-                    colorId: color.metadata.id,
-                    sizeId: variant.size.id,
-                    quantity: variant.quantity,
-                }
-            );
-
-        })
-    );
-
-    Swal.fire({
-        title: "Thành công",
-        text: "Thêm sản phẩm thành công",
-        icon: "success",
-    }).then(() => {
-        router.push("/san-pham");
-    });
-};
-
-const handleUploadProductImages = async () => {
-    const form = new FormData();
-    images.value.forEach((image) => {
-        form.append("images", image.file);
-    });
-    try {
-        loading.value = true;
-        const res = await uploadService.uploadImages(form);
-        const idArray = res.metadata.map((item) => item.id);
-        return idArray;
-    } catch (error) {
-        console.log(error);
-    } finally {
-        loading.value = false;
-    }
-};
-
-const handleUploadVariantImages = async (variant) => {
-    const variantImageForm = new FormData();
-    const colorImageForm = new FormData();
-    variantImageForm.append("image", variant.image.file);
-    colorImageForm.append("image", variant.thumbnail.file);
-    try {
-        loading.value = true;
-        const [variantImageRes, colorImageRes] = await Promise.all([
-            uploadService.uploadImage(variantImageForm),
-            uploadService.uploadImage(colorImageForm),
-        ]);
-
-        return [variantImageRes.metadata.id, colorImageRes.metadata.id];
-    } catch (error) {
-        console.log(error);
-    } finally {
-        loading.value = false;
-    }
-};
 const productSchema = yup.object().shape({
     // productName: yup
     //   .string()
@@ -170,7 +63,7 @@ const productSchema = yup.object().shape({
             <!-- product name begin -->
             <div class="flex flex-col gap-2">
                 <label for="productName" class="text-xl font-bold text-black">Tên sản phẩm</label>
-                <input name="productName" id="productName" type="text" v-model="newProduct.name"
+                <input name="productName" id="productName" type="text" v-model="productStore.newProduct.name"
                     class="w-full h-[55px] border mt-2 p-3 text-md text-gray-600 border-gray-400 rounded"
                     placeholder="Nhập tên sản phẩm..." />
                 <ErrorMessage name="productName" class="text-[15px] text-danger" />
@@ -183,11 +76,11 @@ const productSchema = yup.object().shape({
                 <div>
                     <div v-for="category in categoryStore.categories" :key="category.id">
                         <input class="mr-2" v-model="parentCategory" type="radio" :id="category.id"
-                            @click="newProduct.categoryId = 0" name="parentCategory" :value="category" />
+                            @click="productStore.newProduct.categoryId = 0" name="parentCategory" :value="category" />
                         <label :for="category.id">{{ category.name }}</label><br />
                     </div>
                 </div>
-                <select v-model="newProduct.categoryId"
+                <select v-model="productStore.newProduct.categoryId"
                     class="w-full h-full border mt-2 p-3 text-md text-gray-600 border-gray-400 rounded">
                     <option selected disabled value="0">Chọn danh mục</option>
                     <optgroup v-for="subCategory1 in parentCategory.children" :key="subCategory1.id"
@@ -204,7 +97,7 @@ const productSchema = yup.object().shape({
             <!-- price begin -->
             <div class="flex flex-col gap-2">
                 <label for="price" class="text-xl font-bold text-black">Giá</label>
-                <input name="price" id="price" type="number" v-model="newProduct.price"
+                <input name="price" id="price" type="number" v-model="productStore.newProduct.price"
                     class="w-full h-[55px] border mt-2 p-3 text-md text-gray-600 border-gray-400 rounded"
                     placeholder="Nhập giá sản phẩm..." />
                 <ErrorMessage name="price" class="text-[15px] text-danger" />
@@ -215,11 +108,11 @@ const productSchema = yup.object().shape({
             <div class="flex flex-col gap-2">
                 <label class="text-xl font-bold text-black">Trạng thái</label>
                 <div>
-                    <input class="mr-2" v-model="newProduct.visible" type="radio" id="visible" name="visibility"
-                        value="true" />
+                    <input class="mr-2" v-model="productStore.newProduct.visible" type="radio" id="visible"
+                        name="visibility" value="true" />
                     <label for="visible"> Hiển thị</label><br />
-                    <input class="mr-2" v-model="newProduct.visible" type="radio" id="invisible" name="visibility"
-                        value="false" />
+                    <input class="mr-2" v-model="productStore.newProduct.visible" type="radio" id="invisible"
+                        name="visibility" value="false" />
                     <label for="invisible"> Không hiển thị</label><br />
                 </div>
             </div>
@@ -230,24 +123,24 @@ const productSchema = yup.object().shape({
         <div class="grid grid-cols-2 gap-3">
             <div class="col-span-1 flex flex-col gap-2">
                 <label class="text-xl font-bold text-black">Mô tả</label>
-                <ckeditor :editor="editor" v-model="newProduct.description"></ckeditor>
+                <ckeditor :editor="editor" v-model="productStore.newProduct.description"></ckeditor>
             </div>
 
             <div class="col-span-1 flex flex-col gap-2">
                 <label class="text-xl font-bold text-black">Tổng quan</label>
-                <ckeditor :editor="editor" v-model="newProduct.overview"></ckeditor>
+                <ckeditor :editor="editor" v-model="productStore.newProduct.overview"></ckeditor>
             </div>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
             <div class="col-span-1 flex flex-col gap-2">
                 <label class="text-xl font-bold text-black">Chất liệu</label>
-                <ckeditor :editor="editor" v-model="newProduct.material"></ckeditor>
+                <ckeditor :editor="editor" v-model="productStore.newProduct.material"></ckeditor>
             </div>
 
             <div class="col-span-1 flex flex-col gap-2">
                 <label class="text-xl font-bold text-black">Hướng dẫn giặt</label>
-                <ckeditor :editor="editor" v-model="newProduct.instruction"></ckeditor>
+                <ckeditor :editor="editor" v-model="productStore.newProduct.instruction"></ckeditor>
             </div>
         </div>
         <!-- ckeditor end -->
@@ -255,16 +148,17 @@ const productSchema = yup.object().shape({
         <!-- product image begin -->
         <div class="flex flex-col gap-2">
             <label class="text-xl font-bold text-black">Hình ảnh</label>
-            <div class="grid grid-cols-3 gap-2 border rounded p-4">
-                <div v-for="(image, index) of images" :key="image.file.name"
-                    class="col-span-1 w-[300px] h-[300px] flex items-center justify-center border-2 border-dashed border-slate-200">
+            <div class="grid grid-cols-4 gap-2 border rounded p-4">
+                <div v-for="(image, index) of productStore.images" :key="image.file.name"
+                    class="relative ol-span-1 w-[300px] h-[300px] flex items-center justify-center border-2 border-dashed border-slate-200">
                     <img class="w-[300px] h-[300px] object-contain overflow-hidden" :src="image.path" />
-                    <div class="cursor-pointer">
-                        <DeleteIcon class="absolute top-2 right-2" @click.prevent="removeProductImage(index)" />
+                    <div class="cursor-pointer flex gap-4 absolute top-2 right-2">
+                        <EditIcon />
+                        <DeleteIcon class="" @click.prevent="removeProductImage(index)" />
                     </div>
                 </div>
 
-                <div @click="uploadImage('productImages')"
+                <div @click="productStore.uploadImage('productImages')"
                     class="cursor-pointer relative col-span-1 w-[300px] h-[300px] flex items-center justify-center border-2 border-dashed border-slate-200">
                     <ImageIcon />
                     <div class="absolute top-0 left-0 invisible">

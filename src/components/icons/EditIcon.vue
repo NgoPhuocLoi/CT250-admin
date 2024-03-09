@@ -1,10 +1,14 @@
 <script setup></script>
 
 <template>
-  <svg width="1em" height="1em" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg" font-size="35">
-    <path
-      d="M30.8064 9.97236L25.027 4.193C24.3217 3.48774 23.1783 3.48774 22.473 4.193L7.61229 19.0537C7.27361 19.3924 7.08334 19.8518 7.08334 20.3307L7.08334 27.013C7.08334 27.5117 7.48762 27.916 7.98631 27.916L14.6686 27.916C15.1476 27.916 15.6069 27.7257 15.9456 27.3871L30.8064 12.5263C31.5116 11.8211 31.5116 10.6776 30.8064 9.97236Z"
-      stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-    <path d="M23.5406 27.959H29.4332" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 28 28" fill="currentColor" stroke="#516ee1"
+    stroke-width="0.00024000000000000003">
+    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+    <g id="SVGRepo_iconCarrier">
+      <path fill-rule="evenodd" clip-rule="evenodd"
+        d="M8.56078 20.2501L20.5608 8.25011L15.7501 3.43945L3.75012 15.4395V20.2501H8.56078ZM15.7501 5.56077L18.4395 8.25011L16.5001 10.1895L13.8108 7.50013L15.7501 5.56077ZM12.7501 8.56079L15.4395 11.2501L7.93946 18.7501H5.25012L5.25012 16.0608L12.7501 8.56079Z"
+        fill="#516ee1"></path>
+    </g>
   </svg>
 </template>

@@ -1,14 +1,14 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { Modal, Ripple, initTWE } from "tw-elements";
-import { useSizeStore, useVariantStore } from "@/stores";
+import { useSizeStore, useProductStore } from "@/stores";
 
 import ImageIcon from "@/components/icons/ImageIcon.vue";
 import DeleteIcon from "@/components/icons/DeleteIcon.vue";
 import EditIcon from "@/components/icons/EditIcon.vue";
 
 const sizeStore = useSizeStore();
-const variantStore = useVariantStore();
+const productStore = useProductStore();
 const modal = ref();
 const variants = ref([]);
 const newVariant = ref({});
@@ -52,7 +52,7 @@ const resetColor = () => {
 const addVariants = () => {
     try {
         modal.value.hide();
-        variantStore.addNewVariants(variants.value);
+        productStore.addNewVariants(variants.value);
         Toast.fire({
             icon: "success",
             title: "Các variant mới đã được thêm",
@@ -64,9 +64,7 @@ const addVariants = () => {
     }
 };
 
-const uploadImage = (elementId) => {
-    document.getElementById(elementId).click();
-};
+
 
 const addVariantImage = (e) => {
     const files = e.target.files;
@@ -135,9 +133,9 @@ const addVariantThumbnail = (e) => {
                                         class="relative w-[150px] h-[150px] flex items-center justify-center border-2 border-dashed border-slate-200">
                                         <img v-if="newVariant.image" class="w-[150px] h-[150px] object-contain"
                                             :src="newVariant.image.path" />
-                                        <div @click="uploadImage('variantImage')" class="cursor-pointer">
-                                            <ImageIcon
-                                                :class="newVariant.image ? 'w-7 h-7 absolute top-2 right-2' : 'w-7 h-7'" />
+                                        <div @click="productStore.uploadImage('variantImage')" class="cursor-pointer">
+                                            <EditIcon v-if="newVariant.image" class="w-8 h-8 absolute top-1 right-1" />
+                                            <ImageIcon v-else />
                                             <div class="absolute top-0 left-0 invisible">
                                                 <input accept="image/*" type="file" id="variantImage"
                                                     @change="addVariantImage" />
@@ -151,9 +149,11 @@ const addVariantThumbnail = (e) => {
                                         class="relative w-[150px] h-[150px] flex items-center justify-center border-2 border-dashed border-slate-200">
                                         <img v-if="newVariant.thumbnail" class="w-[150px] h-[150px] object-contain"
                                             :src="newVariant.thumbnail.path" />
-                                        <div @click="uploadImage('variantThumbnail')" class="cursor-pointer">
-                                            <ImageIcon :class="newVariant.thumbnail ? 'w-7 h-7 absolute top-2 right-2' : 'w-7 h-7'
-                                            " />
+                                        <div @click="productStore.uploadImage('variantThumbnail')"
+                                            class="cursor-pointer">
+                                            <EditIcon v-if="newVariant.thumbnail"
+                                                class="w-8 h-8 absolute top-1 right-1" />
+                                            <ImageIcon v-else />
                                             <div class="absolute top-0 left-0 invisible">
                                                 <input accept="image/*" type="file" id="variantThumbnail"
                                                     @change="addVariantThumbnail" />
@@ -201,7 +201,7 @@ const addVariantThumbnail = (e) => {
                                                     <td
                                                         class="flex gap-4 justify-end py-4 whitespace-nowrap text-sm font-medium">
                                                         <div class="cursor-pointer flex justify-end">
-                                                            <EditIcon class="" @click="editVariant(index)" />
+                                                            <EditIcon @click="editVariant(index)" />
                                                         </div>
                                                         <div class="cursor-pointer flex justify-end">
                                                             <DeleteIcon class="" @click="removeVariant(index)" />

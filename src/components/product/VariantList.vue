@@ -1,14 +1,14 @@
 <script setup>
-import { useVariantStore } from "@/stores";
+import { useProductStore } from "@/stores";
 import DeleteIcon from "@/components/icons/DeleteIcon.vue";
 import EditIcon from "@/components/icons/EditIcon.vue";
 
-const variantStore = useVariantStore();
+const productStore = useProductStore();
 
 </script>
 
 <template>
-    <div v-if="variantStore.variants.length" class="w-[80%] flex flex-col">
+    <div v-if="productStore.variants.length" class="w-[80%] flex flex-col">
         <table class="divide-y divide-gray-200">
             <thead>
                 <tr>
@@ -27,7 +27,7 @@ const variantStore = useVariantStore();
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-                <tr v-for="(variant, index) in variantStore.variants" :key="index">
+                <tr v-for="(variant, index) in productStore.variants" :key="index">
                     <td class="px-3 py-4 whitespace-nowrap text-black">
                         {{ variant.colorName }}</td>
                     <td class="px-3 py-4 whitespace-nowrap text-black">
