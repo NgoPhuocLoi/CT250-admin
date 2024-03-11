@@ -64,8 +64,6 @@ const addVariants = () => {
     }
 };
 
-
-
 const addVariantImage = (e) => {
     const files = e.target.files;
     newVariant.value.image = {

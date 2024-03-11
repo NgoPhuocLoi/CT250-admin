@@ -1,8 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import * as yup from "yup";
-import { Form, Field, ErrorMessage } from "vee-validate";
+import { ErrorMessage } from "vee-validate";
 
 import ImageIcon from "@/components/icons/ImageIcon.vue";
 import EditIcon from "@/components/icons/EditIcon.vue";
@@ -32,29 +31,6 @@ onMounted(async () => {
     }
 });
 
-const addProductImage = (e) => {
-    productStore.addProductImage(e);
-};
-
-const removeProductImage = (imageIndex) => {
-    productStore.removeProductImage(imageIndex);
-};
-
-const productSchema = yup.object().shape({
-    // productName: yup
-    //   .string()
-    //   .required("Không được để trống tên sản phẩm.")
-    //   .max(50, "Tên sản phẩm tối đa 50 ký tự."),
-    // price: yup
-    //   .number()
-    //   .required("Không được để trống giá."),
-    // colorName: yup
-    //   .string()
-    //   .required("Không được để trống tên màu."),
-    // quantity: yup
-    //   .number()
-    //   .required("Không được để trống số lượng."),
-});
 </script>
 
 <template>
@@ -62,11 +38,11 @@ const productSchema = yup.object().shape({
         <div class="flex flex-col gap-6">
             <!-- product name begin -->
             <div class="flex flex-col gap-2">
-                <label for="productName" class="text-xl font-bold text-black">Tên sản phẩm</label>
-                <input name="productName" id="productName" type="text" v-model="productStore.newProduct.name"
+                <label for="name" class="text-xl font-bold text-black">Tên sản phẩm</label>
+                <input name="name" id="name" type="text" v-model="productStore.newProduct.name"
                     class="w-full h-[55px] border mt-2 p-3 text-md text-gray-600 border-gray-400 rounded"
                     placeholder="Nhập tên sản phẩm..." />
-                <ErrorMessage name="productName" class="text-[15px] text-danger" />
+                <ErrorMessage name="name" class="text-[15px] text-danger" />
             </div>
             <!-- product name end -->
 
@@ -123,24 +99,28 @@ const productSchema = yup.object().shape({
         <div class="grid grid-cols-2 gap-3">
             <div class="col-span-1 flex flex-col gap-2">
                 <label class="text-xl font-bold text-black">Mô tả</label>
-                <ckeditor :editor="editor" v-model="productStore.newProduct.description"></ckeditor>
+                <ckeditor name="description" :editor="editor" v-model="productStore.newProduct.description"></ckeditor>
+                <ErrorMessage name="description" class="text-[15px] text-danger" />
             </div>
 
             <div class="col-span-1 flex flex-col gap-2">
                 <label class="text-xl font-bold text-black">Tổng quan</label>
-                <ckeditor :editor="editor" v-model="productStore.newProduct.overview"></ckeditor>
+                <ckeditor name="overview" :editor="editor" v-model="productStore.newProduct.overview"></ckeditor>
+                <ErrorMessage name="overview" class="text-[15px] text-danger" />
             </div>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
             <div class="col-span-1 flex flex-col gap-2">
                 <label class="text-xl font-bold text-black">Chất liệu</label>
-                <ckeditor :editor="editor" v-model="productStore.newProduct.material"></ckeditor>
+                <ckeditor name="material" :editor="editor" v-model="productStore.newProduct.material"></ckeditor>
+                <ErrorMessage name="material" class="text-[15px] text-danger" />
             </div>
 
             <div class="col-span-1 flex flex-col gap-2">
                 <label class="text-xl font-bold text-black">Hướng dẫn giặt</label>
-                <ckeditor :editor="editor" v-model="productStore.newProduct.instruction"></ckeditor>
+                <ckeditor name="instruction" :editor="editor" v-model="productStore.newProduct.instruction"></ckeditor>
+                <ErrorMessage name="instruction" class="text-[15px] text-danger" />
             </div>
         </div>
         <!-- ckeditor end -->
@@ -152,9 +132,13 @@ const productSchema = yup.object().shape({
                 <div v-for="(image, index) of productStore.images" :key="image.file.name"
                     class="relative ol-span-1 w-[300px] h-[300px] flex items-center justify-center border-2 border-dashed border-slate-200">
                     <img class="w-[300px] h-[300px] object-contain overflow-hidden" :src="image.path" />
-                    <div class="cursor-pointer flex gap-4 absolute top-2 right-2">
-                        <EditIcon />
-                        <DeleteIcon class="" @click.prevent="removeProductImage(index)" />
+                    <div class="cursor-pointer flex gap-1 absolute top-2 right-2">
+                        <EditIcon @click="productStore.uploadImage(`editProductImage_${index}`)" />
+                        <DeleteIcon class="" @click.prevent="productStore.removeProductImage(index)" />
+                        <div class="absolute top-0 left-0 invisible">
+                            <input accept="image/*" type="file" :id="`editProductImage_${index}`" 
+                                @change="(e) => productStore.editProductImage(e, index)" />
+                        </div>
                     </div>
                 </div>
 
@@ -162,7 +146,8 @@ const productSchema = yup.object().shape({
                     class="cursor-pointer relative col-span-1 w-[300px] h-[300px] flex items-center justify-center border-2 border-dashed border-slate-200">
                     <ImageIcon />
                     <div class="absolute top-0 left-0 invisible">
-                        <input accept="image/*" type="file" id="productImages" @change="addProductImage" multiple />
+                        <input accept="image/*" type="file" id="productImages" @change="productStore.addProductImage"
+                            multiple />
                     </div>
                 </div>
             </div>

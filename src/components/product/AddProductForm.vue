@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { Form, Field, ErrorMessage } from "vee-validate";
+import { Form } from "vee-validate";
 
 import ExpandIcon from "@/components/icons/ExpandIcon.vue";
 import Spinner from "@/components/common/Spinner.vue";
@@ -127,7 +127,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <Form @submit="handleCreateProduct" :validation-schema="productSchema">
+  <Form @submit="handleCreateProduct" :validation-schema="productStore.productSchema">
     <!-- product begin -->
     <div
       class="mb-8 p-8 flex flex-col flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 rounded-md border-none bg-white shadow-lg outline-none">
