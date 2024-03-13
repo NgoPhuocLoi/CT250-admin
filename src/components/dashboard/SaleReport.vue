@@ -17,6 +17,10 @@ const chartData = computed(() => {
     let labelArray = [];
     let dataArray = [];
     switch (dashboardStore.typeOptionIndex) {
+        case 0:
+            labelArray = dashboardStore.dates.slice(dashboardStore.beginDateIndex, dashboardStore.endDateIndex + 1);
+            dataArray = dashboardStore.prices.slice(dashboardStore.beginDateIndex, dashboardStore.endDateIndex + 1);
+            break;
         case 1:
             labelArray = dashboardStore.months.slice(dashboardStore.beginMonthIndex, dashboardStore.endMonthIndex + 1);
             dataArray = dashboardStore.prices.slice(dashboardStore.beginMonthIndex, dashboardStore.endMonthIndex + 1);
@@ -90,8 +94,30 @@ const chartOptions = ref({
                         </option>
                     </select>
                 </div>
+
+                <!-- daily -->
+                <div v-if="dashboardStore.typeOptionIndex == 0" class="flex items-center justify-center gap-3">
+                    <div class="flex items-center justify-center gap-3">
+                        <p>Từ:</p>
+                        <select class="px-3 border rounded-md py-2 outline-none"
+                            v-model="dashboardStore.beginDateIndex">
+                            <option v-for="(n, i) in dashboardStore.endDateIndex + 1" :key="i" :value="i">
+                                {{ dashboardStore.dates[i] }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="flex items-center justify-center gap-3">
+                        <p>Đến:</p>
+                        <select class="px-3 border rounded-md py-2 outline-none" v-model="dashboardStore.endDateIndex">
+                            <option v-for="(n, i) in 15" :key="i" :value="i">
+                                {{ dashboardStore.dates[i] }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
                 <!-- monthly -->
-                <div v-if="dashboardStore.typeOptionIndex == 1" class="flex items-center justify-center gap-3">
+                <div v-else-if="dashboardStore.typeOptionIndex == 1" class="flex items-center justify-center gap-3">
                     <div class="flex items-center justify-center gap-3">
                         <p>Từ:</p>
                         <select class="px-3 border rounded-md py-2 outline-none"
@@ -112,7 +138,7 @@ const chartOptions = ref({
                 </div>
 
                 <!-- yearly -->
-                <div v-if="dashboardStore.typeOptionIndex == 2" class="flex items-center justify-center gap-3">
+                <div v-else class="flex items-center justify-center gap-3">
                     <div class="flex items-center justify-center gap-3">
                         <p>Từ:</p>
                         <select class="px-3 border rounded-md py-2 outline-none" v-model="dashboardStore.beginYear">
