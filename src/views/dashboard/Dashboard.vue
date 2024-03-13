@@ -2,7 +2,6 @@
 import { ref } from "vue";
 import Breadcrumb from "@/components/common/Breadcrumb.vue";
 import SaleReport from "@/components/dashboard/SaleReport.vue";
-import LineChart from "@/components/dashboard/LineChart.vue";
 import MoneyIcon from "@/components/icons/MoneyIcon.vue";
 import ClothIcon from "@/components/icons/ClothIcon.vue";
 import UserIcon from "@/components/icons/UserIcon.vue";
@@ -12,7 +11,10 @@ const navItems = ref([
     {
         title: "Tổng doanh thu",
         icon: MoneyIcon,
-        value: "2.000.000 VND",
+        value: new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        }).format(2000000),
     },
     {
         title: "Tổng sản phẩm đã bán",
@@ -36,6 +38,5 @@ const subjectIndex = ref(0);
     </div>
     <div class="mt-8">
         <SaleReport v-if="subjectIndex == 0" />
-        <LineChart v-else-if="subjectIndex == 1" />
     </div>
 </template>

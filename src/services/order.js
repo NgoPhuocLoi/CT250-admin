@@ -9,6 +9,10 @@ class OrderService {
     return (await this.api.get("/all")).data;
   }
 
+  async getAllPrice() {
+    return (await this.api.get("/allPrice")).data;
+  }
+
   async getAllOrderStatus() {
     return (await this.api.get("/status-all")).data;
   }

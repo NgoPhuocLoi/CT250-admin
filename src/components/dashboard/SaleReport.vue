@@ -1,79 +1,80 @@
 <script setup>
-import { onMounted, ref, computed, watch } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { Bar } from "vue-chartjs";
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+ChartJS.register(ChartDataLabels, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
-import orderService from "@/services/order";
+import { useDashboardStore } from "@/stores";
 
-const orders = ref([]);
+const dashboardStore = useDashboardStore();
 
 onMounted(async () => {
-    await fetchOrders();
+    await dashboardStore.fetchOrders();
 });
 
-async function fetchOrders(filter) {
-    try {
-        const res = await orderService.getAll(filter);
-        orders.value = res.metadata;
-    } catch (error) {
-        console.log(error);
+const chartData = computed(() => {
+    let labelArray = [];
+    let dataArray = [];
+    switch (dashboardStore.typeOptionIndex) {
+        case 1:
+            labelArray = dashboardStore.months.slice(dashboardStore.beginMonthIndex, dashboardStore.endMonthIndex + 1);
+            dataArray = dashboardStore.prices.slice(dashboardStore.beginMonthIndex, dashboardStore.endMonthIndex + 1);
+            break;
+        case 2:
+            labelArray = dashboardStore.years.slice(dashboardStore.beginYear - dashboardStore.currentYear + 4, dashboardStore.endYear - dashboardStore.currentYear + 5);
+            dataArray = dashboardStore.prices.slice(dashboardStore.beginYear - dashboardStore.currentYear + 4, dashboardStore.endYear - dashboardStore.currentYear + 5);
+            break;
     }
-}
 
-const prices = ref();
-watch(orders, async () => {
-    console.log(orders.value);
-    const priceArray = orders.value.map((order) => (order.finalPrice));
-    prices.value = priceArray.reduce((prev, current) => prev + current, 0);
-    console.log(prices.value);
+    return {
+        labels: labelArray,
+        datasets: [
+            {
+                label: "Doanh thu",
+                backgroundColor: "#6cbbecd9",
+                data: dataArray,
+            }
+        ]
+    }
 });
 
-// const prices = computed(() => {
-//     console.log(orders.value);
-//     const priceArray = orders.value.map((order) => (order.finalPrice));
-//     console.log(priceArray);
-//     return priceArray.reduce((prev, current) => prev + current, 0);
-// })
-
-const typeOptions = ref([
-    "Theo ngày",
-    "Theo tháng",
-    "Theo năm"
-]);
-
-const monthOptions = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
-];
-
-const chartData = ref({
-    labels: monthOptions,
-    datasets: [
-        {
-            label: "Doanh thu",
-            backgroundColor: "rgba(1, 116, 188, 0.50)",
-            data: [4000000, 2000000, 1200000, 3900000, 1000000, 4000000, 3900000, 8000000, 4000000, 2000000, 1200000, +prices.value]
-        }
-    ]
-});
+const chartPlugin = ref([
+    ChartDataLabels,
+])
 
 const chartOptions = ref({
+    layout: {
+        padding: 20
+    },
     responsive: true,
-    maintainAspectRatio: false
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            display: true,
+            // position: 'bottom',
+            // align: 'start',
+            labels: {
+                font: { size: 20 }
+            },
+        },
+        datalabels: {
+            anchor: 'end',
+            align: 'top',
+            formatter: function (value) {
+                return new Intl.NumberFormat("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                }).format(value);
+            },
+            color: '#fd0',
+            font: {
+                size: 20,
+                weight: 'bold'
+            }
+        }
+    }
 });
-
-const typeOptionIndex = ref(2);
 
 </script>
 <template>
@@ -83,34 +84,64 @@ const typeOptionIndex = ref(2);
             <div class="flex gap-8">
                 <div class="flex items-center justify-center gap-3">
                     <p>Định dạng:</p>
-                    <select class="px-3 border rounded-md py-2 outline-none" v-model="typeOptionIndex">
-                        <option v-for="(option, index) in typeOptions" :key="index" :value="index"
-                            :class="[{ 'text-gray-900': index === typeOptionIndex }, optionClass]">
+                    <select class="px-3 border rounded-md py-2 outline-none" v-model="dashboardStore.typeOptionIndex">
+                        <option v-for="(option, index) in dashboardStore.typeOptions" :key="index" :value="index">
                             {{ option }}
                         </option>
                     </select>
                 </div>
-                <div class="flex items-center justify-center gap-3">
-                    <p>Từ:</p>
-                    <select class="px-3 border rounded-md py-2 outline-none" v-model="typeOptionIndex">
-                        <option v-for="(option, index) in typeOptions" :key="index" :value="index"
-                            :class="[{ 'text-gray-900': index === typeOptionIndex }, optionClass]">
-                            {{ option }}
-                        </option>
-                    </select>
+                <!-- monthly -->
+                <div v-if="dashboardStore.typeOptionIndex == 1" class="flex items-center justify-center gap-3">
+                    <div class="flex items-center justify-center gap-3">
+                        <p>Từ:</p>
+                        <select class="px-3 border rounded-md py-2 outline-none"
+                            v-model="dashboardStore.beginMonthIndex">
+                            <option v-for="(n, i) in dashboardStore.endMonthIndex + 1" :key="i" :value="i">
+                                {{ dashboardStore.months[i] }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="flex items-center justify-center gap-3">
+                        <p>Đến:</p>
+                        <select class="px-3 border rounded-md py-2 outline-none" v-model="dashboardStore.endMonthIndex">
+                            <option v-for="(n, i) in dashboardStore.currentMonthIndex + 6" :key="i" :value="i">
+                                {{ dashboardStore.months[i] }}
+                            </option>
+                        </select>
+                    </div>
                 </div>
-                <div class="flex items-center justify-center gap-3">
-                    <p>Đến:</p>
-                    <select class="px-3 border rounded-md py-2 outline-none" v-model="typeOptionIndex">
-                        <option v-for="(option, index) in typeOptions" :key="index" :value="index"
-                            :class="[{ 'text-gray-900': index === typeOptionIndex }, optionClass]">
-                            {{ option }}
-                        </option>
-                    </select>
+
+                <!-- yearly -->
+                <div v-if="dashboardStore.typeOptionIndex == 2" class="flex items-center justify-center gap-3">
+                    <div class="flex items-center justify-center gap-3">
+                        <p>Từ:</p>
+                        <select class="px-3 border rounded-md py-2 outline-none" v-model="dashboardStore.beginYear">
+                            <option v-for="(n, i) in dashboardStore.endYear - dashboardStore.currentYear + 5" :key="i"
+                                :value="i + dashboardStore.currentYear - 4">
+                                {{ i + dashboardStore.currentYear - 4 }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="flex items-center justify-center gap-3">
+                        <p>Đến:</p>
+                        <select class="px-3 border rounded-md py-2 outline-none" v-model="dashboardStore.endYear">
+                            <option v-for="(n, i) in 5" :key="i" :value="i + dashboardStore.currentYear - 4">
+                                {{ i + dashboardStore.currentYear - 4 }}
+                            </option>
+                        </select>
+                    </div>
                 </div>
+
             </div>
         </div>
-        <div class="text-xl">Tổng doanh thu: 2.000.000 VND</div>
-        <Bar id="my-chart-id" :options="chartOptions" :data="chartData" />
+        <div class="text-xl">Tổng doanh thu:
+            <span class="text-[#3CCF4E] text-2xl font-bold">
+                {{ new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                    }).format(dashboardStore.totalPrice) }}
+            </span>
+        </div>
+        <Bar id="my-chart-id" :plugins="chartPlugin" :options="chartOptions" :data="chartData" />
     </div>
 </template>
