@@ -4,6 +4,7 @@ import ProductsView from "@/views/product/ProductsView.vue";
 import OrdersView from "@/views/order/OrdersView.vue";
 import OrderDetailView from "@/views/order/OrderDetailView.vue";
 import AddProductView from "@/views/product/AddProductView.vue";
+import Dashboard from "@/views/dashboard/Dashboard.vue";
 
 import { createRouter, createWebHistory } from "vue-router";
 const router = createRouter({
@@ -14,6 +15,10 @@ const router = createRouter({
       name: "",
       component: DefaultLayout,
       children: [
+        {
+          path: "",
+          component: Dashboard,
+        },
         {
           path: "danh-muc-san-pham",
           component: CategoriesView,
