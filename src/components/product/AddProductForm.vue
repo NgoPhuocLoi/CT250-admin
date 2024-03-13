@@ -108,7 +108,6 @@ const handleCreateProduct = async () => {
         productImageId: productImageId.metadata.id,
         thumbnailImageId: uploadedVariantImageIds[1],
       });
-      console.log("color", color.metadata);
 
       // variant = await createVariant
       const createdVariant = await productService.createVariant(
@@ -120,8 +119,6 @@ const handleCreateProduct = async () => {
           quantity: variant.quantity,
         }
       );
-
-      console.log("variant", createdVariant.metadata);
     })
   );
 

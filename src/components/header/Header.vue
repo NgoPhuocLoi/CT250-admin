@@ -55,7 +55,7 @@ import DropdownUser from "./DropdownUser.vue";
           </li>
 
           <!-- Notification Menu Area -->
-          <DropdownNotification />
+          <!-- <DropdownNotification /> -->
           <!-- Notification Menu Area -->
 
           <!-- Chat Notification Area -->
