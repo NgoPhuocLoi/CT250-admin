@@ -4,6 +4,7 @@ import ProductsView from "@/views/product/ProductsView.vue";
 import OrdersView from "@/views/order/OrdersView.vue";
 import OrderDetailView from "@/views/order/OrderDetailView.vue";
 import AddProductView from "@/views/product/AddProductView.vue";
+import CouponsView from "@/views/coupon/CouponsView.vue";
 import Dashboard from "@/views/dashboard/Dashboard.vue";
 
 import { createRouter, createWebHistory } from "vue-router";
@@ -38,6 +39,10 @@ const router = createRouter({
         {
           path: "don-hang/:orderId",
           component: OrderDetailView,
+        },
+        {
+          path: "ma-giam-gia",
+          component: CouponsView,
         },
       ],
     },

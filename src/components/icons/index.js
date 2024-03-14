@@ -5,7 +5,8 @@ export { default as ExpandIcon } from "./ExpandIcon.vue";
 export { default as MoneyIcon } from "./MoneyIcon.vue";
 export { default as ClothIcon } from "./ClothIcon.vue";
 export { default as UserIcon } from "./UserIcon.vue";
-
-
-
-
+export { default as GiftIcon } from "./GiftIcon.vue";
+export { default as DashBoardIcon } from "./DashboardIcon.vue";
+export { default as ProductCategoryIcon } from "./ProductCategoryIcon.vue";
+export { default as ProductIcon } from "./ProductIcon.vue";
+export { default as OrderIcon } from "./OrderIcon.vue";
