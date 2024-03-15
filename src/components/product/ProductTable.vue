@@ -101,9 +101,10 @@ const fetchProducts = async () => {
           </div>
         </div>
         <div class="col-span-1 hidden items-center justify-center sm:flex">
-          <p class="text-sm font-medium text-black">
-            {{ product.id }}
-          </p>
+          <RouterLink :to="`/san-pham/${product.id}`"
+            class="text-sm font-bold underline-offset-2 underline text-black mx-auto">
+            #{{ product.id }}
+          </RouterLink>
         </div>
         <div class="col-span-2 flex items-center">
           <p class="text-sm font-medium text-black pl-5">
@@ -122,7 +123,6 @@ const fetchProducts = async () => {
         </div>
         <div class="col-span-1 hidden items-center justify-center sm:flex">
           <p class="text-sm font-medium text-black">
-            <!-- {{ product.quantity }} -->
             {{ totalQuantity(product.variants) }}
           </p>
         </div>
