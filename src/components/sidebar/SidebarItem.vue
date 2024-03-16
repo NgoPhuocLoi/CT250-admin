@@ -31,7 +31,7 @@ const handleItemClick = () => {
         'bg-graydark dark:bg-meta-4': sidebarStore.page === item.label,
       }"
     >
-      <span v-html="item.icon"></span>
+      <component :is="item.icon"></component>
 
       {{ item.label }}
 
