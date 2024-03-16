@@ -2,6 +2,7 @@
 import { onMounted } from "vue";
 import { useRoute } from "vue-router";
 import productService from "@/services/product";
+import categoryService from "@/services/category";
 import AddProductForm from "@/components/product/AddProductForm.vue";
 import { useProductStore } from "@/stores";
 
@@ -14,16 +15,21 @@ onMounted(async () => {
 
 async function fetchProductInformation() {
   try {
-    const res = await productService.getOneById(route.params.productId);
-    console.log(res.metadata)
-    productStore.newProduct = { ...res.metadata };
-    productStore.images = productStore.newProduct.images.map((img) => {
+
+    const res1 = await productService.getOneById(route.params.productId);
+    productStore.setNewProduct({ ...res1.metadata });
+
+    const res2 = await categoryService.getRootParent(productStore.newProduct.categoryId);
+    productStore.setParentCategoryId(res2.metadata.id);
+
+    productStore.setImages(productStore.newProduct.images.map((img) => {
       return {
         file: { name: img.image.filename },
         path: img.image.path
       }
-    });
-    productStore.variants = productStore.newProduct.variants.map((variant) => {
+    }));
+
+    productStore.setVariants(productStore.newProduct.variants.map((variant) => {
       return {
         ...variant,
         colorName: variant.color.name,
@@ -38,7 +44,7 @@ async function fetchProductInformation() {
         },
         quantity: variant.quantity,
       }
-    })
+    }));
   } catch (error) {
     console.log(error);
   }

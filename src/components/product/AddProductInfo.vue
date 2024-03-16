@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { onMounted } from "vue";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { ErrorMessage } from "vee-validate";
 
@@ -17,7 +17,6 @@ const sizeStore = useSizeStore();
 const productStore = useProductStore();
 
 const editor = ClassicEditor;
-const parentCategory = ref({});
 
 onMounted(async () => {
     try {
@@ -51,15 +50,15 @@ onMounted(async () => {
                 <label class="text-xl font-bold text-black">Danh mục</label>
                 <div>
                     <div v-for="category in categoryStore.categories" :key="category.id">
-                        <input class="mr-2" v-model="parentCategory" type="radio" :id="category.id"
-                            @click="productStore.newProduct.categoryId = 0" name="parentCategory" :value="category" />
+                        <input class="mr-2" v-model="productStore.parentCategoryId" type="radio" :id="category.id"
+                            @click="productStore.newProduct.categoryId = 0" name="parentCategory" :value="category.id" />
                         <label :for="category.id">{{ category.name }}</label><br />
                     </div>
                 </div>
                 <select v-model="productStore.newProduct.categoryId"
                     class="w-full h-full border mt-2 p-3 text-md text-gray-600 border-gray-400 rounded">
                     <option selected disabled value="0">Chọn danh mục</option>
-                    <optgroup v-for="subCategory1 in parentCategory.children" :key="subCategory1.id"
+                    <optgroup v-for="subCategory1 in productStore.parentCategory?.children" :key="subCategory1.id"
                         :label="subCategory1.name">
                         <option v-for="subCategory2 in subCategory1.children" :key="subCategory2.id"
                             :value="subCategory2.id">
@@ -136,7 +135,7 @@ onMounted(async () => {
                         <EditIcon @click="productStore.uploadImage(`editProductImage_${index}`)" />
                         <DeleteIcon class="" @click.prevent="productStore.removeProductImage(index)" />
                         <div class="absolute top-0 left-0 invisible">
-                            <input accept="image/*" type="file" :id="`editProductImage_${index}`" 
+                            <input accept="image/*" type="file" :id="`editProductImage_${index}`"
                                 @change="(e) => productStore.editProductImage(e, index)" />
                         </div>
                     </div>
