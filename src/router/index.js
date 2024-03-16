@@ -5,9 +5,11 @@ import OrdersView from "@/views/order/OrdersView.vue";
 import OrderDetailView from "@/views/order/OrderDetailView.vue";
 import AddProductView from "@/views/product/AddProductView.vue";
 import CouponsView from "@/views/coupon/CouponsView.vue";
+import CouponDetailView from "@/views/coupon/CouponDetailView.vue";
 import Dashboard from "@/views/dashboard/Dashboard.vue";
 
 import { createRouter, createWebHistory } from "vue-router";
+import CouponAddView from "@/views/coupon/CouponAddView.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -43,6 +45,15 @@ const router = createRouter({
         {
           path: "ma-giam-gia",
           component: CouponsView,
+        },
+
+        {
+          path: "ma-giam-gia/chinh-sua/:couponCode",
+          component: CouponDetailView,
+        },
+        {
+          path: "ma-giam-gia/them",
+          component: CouponAddView,
         },
       ],
     },

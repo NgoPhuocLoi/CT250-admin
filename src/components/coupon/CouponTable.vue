@@ -126,7 +126,7 @@ async function fetchCoupons() {
               >
             </div>
             <RouterLink
-              :to="`/ma-giam-gia/${coupon.code}`"
+              :to="`/ma-giam-gia/chinh-sua/${coupon.code}`"
               class="text-sm font-bold text-black mx-auto"
             >
               {{ coupon.code }}
