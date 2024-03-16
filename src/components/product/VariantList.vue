@@ -42,10 +42,10 @@ const productStore = useProductStore();
                         {{ variant.quantity }}</td>
                     <td class="flex gap-4 justify-end py-4 whitespace-nowrap">
                         <div class="cursor-pointer flex justify-end">
-                            <EditIcon class="" />
+                            <EditIcon />
                         </div>
                         <div class="cursor-pointer flex justify-end">
-                            <DeleteIcon class="" />
+                            <DeleteIcon @click="productStore.removeVariant(index)" />
                         </div>
                     </td>
                 </tr>

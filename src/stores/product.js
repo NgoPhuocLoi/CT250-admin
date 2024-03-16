@@ -75,6 +75,10 @@ const useProductStore = defineStore("product", () => {
     variants.value = variants.value.concat(newVariants);
   };
 
+  const removeVariant = (variantIndex) => {
+    variants.value.splice(variantIndex, 1);
+  }
+
   return {
     productSchema,
     newProduct,
@@ -88,6 +92,7 @@ const useProductStore = defineStore("product", () => {
     removeProductImage,
     setVariants,
     addNewVariants,
+    removeVariant,
   };
 });
 

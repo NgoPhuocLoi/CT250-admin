@@ -40,6 +40,10 @@ class ProductService {
   async getOneBySlug(slug) {
     return (await this.api.get(`/slug/${slug}`)).data;
   }
+
+  async getOneById(id) {
+    return (await this.api.get(`/${id}`)).data;
+  }
 }
 
 export default new ProductService();
