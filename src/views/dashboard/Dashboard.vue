@@ -10,27 +10,31 @@ import { useDashboardStore } from "@/stores";
 const dashboardStore = useDashboardStore();
 
 const navItems = ref([
-    {
-        title: "Tổng doanh thu",
-        icon: MoneyIcon,
-    },
-    {
-        title: "Tổng sản phẩm đã bán",
-        icon: ClothIcon,
-    },
-    {
-        title: "Số người dùng",
-        icon: UserIcon,
-    },
+  {
+    title: "Tổng doanh thu",
+    icon: MoneyIcon,
+  },
+  {
+    title: "Sản phẩm đã bán",
+    icon: ClothIcon,
+  },
+  {
+    title: "Số người dùng",
+    icon: UserIcon,
+  },
 ]);
-
 </script>
 <template>
-    <Breadcrumb page-title="Dashboard" />
-    <div class="flex justify-between gap-14">
-        <DashboardNavItem v-for="(item, index) in navItems" :key="index" :index="index" :item="item" />
-    </div>
-    <div class="mt-8">
-        <ReportView />
-    </div>
+  <Breadcrumb page-title="Dashboard" />
+  <div class="flex justify-between gap-10">
+    <DashboardNavItem
+      v-for="(item, index) in navItems"
+      :key="index"
+      :index="index"
+      :item="item"
+    />
+  </div>
+  <div class="mt-8">
+    <ReportView />
+  </div>
 </template>
