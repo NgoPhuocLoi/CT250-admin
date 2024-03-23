@@ -6,8 +6,6 @@ import MoneyIcon from "@/components/icons/MoneyIcon.vue";
 import ClothIcon from "@/components/icons/ClothIcon.vue";
 import UserIcon from "@/components/icons/UserIcon.vue";
 import DashboardNavItem from "@/components/dashboard/DashboardNavItem.vue";
-import { useDashboardStore } from "@/stores";
-const dashboardStore = useDashboardStore();
 
 const navItems = ref([
   {

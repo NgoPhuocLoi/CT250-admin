@@ -1,24 +1,29 @@
 <script setup>
 import { onMounted, ref, computed } from "vue";
-import { Bar } from "vue-chartjs";
+import { Line, Pie, Bar } from "vue-chartjs";
 import {
   Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
   CategoryScale,
   LinearScale,
+  PointElement,
+  LineElement,
+  ArcElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
 } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 ChartJS.register(
-  ChartDataLabels,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  ArcElement,
+  BarElement,
   Title,
   Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale
+  Legend
 );
 
 import ToggleButton from "@/components/dashboard/ToggleButton.vue";
@@ -36,19 +41,50 @@ onMounted(async () => {
 
 const chartData = computed(() => {
   let labelArray = [];
-  let saleDataArray = [];
-  let productDataArray = [];
+  let menSaleDataArray = [];
+  let womenSaleDataArray = [];
+  let childrenSaleDataArray = [];
+  let menProductDataArray = [];
+  let womenProductDataArray = [];
+  let childrenProductDataArray = [];
+
+  let menSalePercentage = 0;
+  let womenSalePercentage = 0;
+  let childrenSalePercentage = 0;
+
+  let menProductPercentage = 0;
+  let womenProductPercentage = 0;
+  let childrenProductPercentage = 0;
+
   switch (dashboardStore.typeOptionIndex) {
     case 0:
       labelArray = dashboardStore.dates.slice(
         dashboardStore.beginDateIndex,
         dashboardStore.endDateIndex + 1
       );
-      saleDataArray = dashboardStore.prices.slice(
+      // price
+      menSaleDataArray = dashboardStore.menPrices.slice(
         dashboardStore.beginDateIndex,
         dashboardStore.endDateIndex + 1
       );
-      productDataArray = dashboardStore.quantities.slice(
+      womenSaleDataArray = dashboardStore.womenPrices.slice(
+        dashboardStore.beginDateIndex,
+        dashboardStore.endDateIndex + 1
+      );
+      childrenSaleDataArray = dashboardStore.childrenPrices.slice(
+        dashboardStore.beginDateIndex,
+        dashboardStore.endDateIndex + 1
+      );
+      // quantity
+      menProductDataArray = dashboardStore.menQuantities.slice(
+        dashboardStore.beginDateIndex,
+        dashboardStore.endDateIndex + 1
+      );
+      womenProductDataArray = dashboardStore.womenQuantities.slice(
+        dashboardStore.beginDateIndex,
+        dashboardStore.endDateIndex + 1
+      );
+      childrenProductDataArray = dashboardStore.childrenQuantities.slice(
         dashboardStore.beginDateIndex,
         dashboardStore.endDateIndex + 1
       );
@@ -58,11 +94,29 @@ const chartData = computed(() => {
         dashboardStore.beginMonthIndex,
         dashboardStore.endMonthIndex + 1
       );
-      saleDataArray = dashboardStore.prices.slice(
+      // price
+      menSaleDataArray = dashboardStore.menPrices.slice(
         dashboardStore.beginMonthIndex,
         dashboardStore.endMonthIndex + 1
       );
-      productDataArray = dashboardStore.quantities.slice(
+      womenSaleDataArray = dashboardStore.womenPrices.slice(
+        dashboardStore.beginMonthIndex,
+        dashboardStore.endMonthIndex + 1
+      );
+      childrenSaleDataArray = dashboardStore.childrenPrices.slice(
+        dashboardStore.beginMonthIndex,
+        dashboardStore.endMonthIndex + 1
+      );
+      // quantity
+      menProductDataArray = dashboardStore.menQuantities.slice(
+        dashboardStore.beginMonthIndex,
+        dashboardStore.endMonthIndex + 1
+      );
+      womenProductDataArray = dashboardStore.womenQuantities.slice(
+        dashboardStore.beginMonthIndex,
+        dashboardStore.endMonthIndex + 1
+      );
+      childrenProductDataArray = dashboardStore.childrenQuantities.slice(
         dashboardStore.beginMonthIndex,
         dashboardStore.endMonthIndex + 1
       );
@@ -72,42 +126,130 @@ const chartData = computed(() => {
         dashboardStore.beginYear - dashboardStore.currentYear + 4,
         dashboardStore.endYear - dashboardStore.currentYear + 5
       );
-      saleDataArray = dashboardStore.prices.slice(
+      // price
+      menSaleDataArray = dashboardStore.menPrices.slice(
         dashboardStore.beginYear - dashboardStore.currentYear + 4,
         dashboardStore.endYear - dashboardStore.currentYear + 5
       );
-      productDataArray = dashboardStore.quantities.slice(
+      womenSaleDataArray = dashboardStore.womenPrices.slice(
+        dashboardStore.beginYear - dashboardStore.currentYear + 4,
+        dashboardStore.endYear - dashboardStore.currentYear + 5
+      );
+      childrenSaleDataArray = dashboardStore.childrenPrices.slice(
+        dashboardStore.beginYear - dashboardStore.currentYear + 4,
+        dashboardStore.endYear - dashboardStore.currentYear + 5
+      );
+      // quantity
+      menProductDataArray = dashboardStore.menQuantities.slice(
+        dashboardStore.beginYear - dashboardStore.currentYear + 4,
+        dashboardStore.endYear - dashboardStore.currentYear + 5
+      );
+      womenProductDataArray = dashboardStore.womenQuantities.slice(
+        dashboardStore.beginYear - dashboardStore.currentYear + 4,
+        dashboardStore.endYear - dashboardStore.currentYear + 5
+      );
+      childrenProductDataArray = dashboardStore.childrenQuantities.slice(
         dashboardStore.beginYear - dashboardStore.currentYear + 4,
         dashboardStore.endYear - dashboardStore.currentYear + 5
       );
       break;
   }
 
+  // calculate data for pie-chart
+  // sale
+  let totalSale = menSaleDataArray.reduce((a, b) => a + b, 0) + womenSaleDataArray.reduce((a, b) => a + b, 0) + childrenSaleDataArray.reduce((a, b) => a + b, 0);
+  menSalePercentage = Number(((menSaleDataArray.reduce((a, b) => a + b, 0) / totalSale) * 100).toFixed(2));
+  womenSalePercentage = Number(((womenSaleDataArray.reduce((a, b) => a + b, 0) / totalSale) * 100).toFixed(2));
+  childrenSalePercentage = Number(((childrenSaleDataArray.reduce((a, b) => a + b, 0) / totalSale) * 100).toFixed(2));
+  // product
+  let totalProduct = menProductDataArray.reduce((a, b) => a + b, 0) + womenProductDataArray.reduce((a, b) => a + b, 0) + childrenProductDataArray.reduce((a, b) => a + b, 0);
+  menProductPercentage = Number(((menProductDataArray.reduce((a, b) => a + b, 0) / totalProduct) * 100).toFixed(2));
+  womenProductPercentage = Number(((womenProductDataArray.reduce((a, b) => a + b, 0) / totalProduct) * 100).toFixed(2));
+  childrenProductPercentage = Number(((childrenProductDataArray.reduce((a, b) => a + b, 0) / totalProduct) * 100).toFixed(2));
+
+  const menColor = "#40A2E3";
+  const womenColor = "#EE4266";
+  const childrenColor = "#FF9800";
+
   return dashboardStore.subjectIndex == 0
-    ? {
+    ? [
+      {
         labels: labelArray,
         datasets: [
           {
-            label: "Doanh thu",
-            backgroundColor: "#6cbbecd9",
-            data: saleDataArray,
+            label: "Nam",
+            borderColor: menColor,
+            backgroundColor: menColor,
+            fill: false,
+            data: menSaleDataArray,
+          },
+          {
+            label: "Nữ",
+            borderColor: womenColor,
+            backgroundColor: womenColor,
+            fill: false,
+            data: womenSaleDataArray,
+          },
+          {
+            label: "Trẻ em",
+            borderColor: childrenColor,
+            backgroundColor: childrenColor,
+            fill: false,
+            data: childrenSaleDataArray,
+          },
+        ],
+      },
+      {
+        labels: ["Nam", "Nữ", "Trẻ em"],
+        datasets: [
+          {
+            backgroundColor: [menColor, womenColor, childrenColor],
+            data: [menSalePercentage, womenSalePercentage, childrenSalePercentage],
           },
         ],
       }
-    : {
+    ]
+    : [
+      {
         labels: labelArray,
         datasets: [
           {
-            label: "Sản phẩm đã bán",
-            backgroundColor: "#6cbbecd9",
-            data: productDataArray,
+            label: "Nam",
+            borderColor: menColor,
+            backgroundColor: menColor,
+            fill: false,
+            data: menProductDataArray,
+          },
+          {
+            label: "Nữ",
+            borderColor: womenColor,
+            backgroundColor: womenColor,
+            fill: false,
+            data: womenProductDataArray,
+          },
+          {
+            label: "Trẻ em",
+            borderColor: childrenColor,
+            backgroundColor: childrenColor,
+            fill: false,
+            data: childrenProductDataArray,
           },
         ],
-      };
+      },
+      {
+        labels: ["Nam", "Nữ", "Trẻ em"],
+        datasets: [
+          {
+            backgroundColor: [menColor, womenColor, childrenColor],
+            data: [menProductPercentage, womenProductPercentage, childrenProductPercentage],
+          },
+        ],
+      }
+    ];
 });
 
 const chartPlugin = ref([ChartDataLabels]);
-
+ChartJS.defaults.font.size = 20;
 const chartOptions = ref({
   layout: {
     padding: 20,
@@ -127,12 +269,12 @@ const chartOptions = ref({
       formatter: function (value) {
         return dashboardStore.subjectIndex == 0
           ? new Intl.NumberFormat("vi-VN", {
-              style: "currency",
-              currency: "VND",
-            }).format(value)
+            style: "currency",
+            currency: "VND",
+          }).format(value)
           : value;
       },
-      color: "#fd0",
+      color: "black",
       font: {
         size: 20,
         weight: "bold",
@@ -140,6 +282,35 @@ const chartOptions = ref({
     },
   },
 });
+
+const pieChartOptions = ref({
+  layout: {
+    padding: 20,
+  },
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: true,
+      labels: {
+        font: { size: 20 },
+      },
+    },
+    datalabels: {
+      anchor: "end",
+      align: "top",
+      formatter: function (value) {
+        return value + "%";
+      },
+      color: "black",
+      font: {
+        size: 20,
+        weight: "bold",
+      },
+    },
+  },
+});
+
 </script>
 <template>
   <div class="h-[500px] flex flex-col gap-2">
@@ -148,19 +319,11 @@ const chartOptions = ref({
         <h2 class="uppercase text-xl font-bold text-black">Biểu đồ</h2>
         <ToggleButton />
       </div>
-      <!-- <DailyOption v-if="dashboardStore.typeOptionIndex == 0" /> -->
       <div class="flex gap-8">
         <div class="flex items-center justify-center gap-3">
           <p>Định dạng:</p>
-          <select
-            class="px-3 border rounded-md py-2 outline-none"
-            v-model="dashboardStore.typeOptionIndex"
-          >
-            <option
-              v-for="(option, index) in dashboardStore.typeOptions"
-              :key="index"
-              :value="index"
-            >
+          <select class="px-3 border rounded-md py-2 outline-none" v-model="dashboardStore.typeOptionIndex">
+            <option v-for="(option, index) in dashboardStore.typeOptions" :key="index" :value="index">
               {{ option }}
             </option>
           </select>
@@ -174,11 +337,11 @@ const chartOptions = ref({
       Tổng doanh thu:
       <span class="text-[#3CCF4E] text-2xl font-bold">
         {{
-          new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-          }).format(dashboardStore.totalPrice)
-        }}
+            new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            }).format(dashboardStore.totalPrice)
+          }}
       </span>
     </div>
     <div v-else>
@@ -187,11 +350,14 @@ const chartOptions = ref({
         {{ dashboardStore.totalQuantity }}
       </span>
     </div>
-    <Bar
-      id="my-chart-id"
-      :plugins="chartPlugin"
-      :options="chartOptions"
-      :data="chartData"
-    />
+    <div class="grid grid-cols-3 w-full">
+      <div class="col-span-2">
+        <Line :plugins="chartPlugin" :options="chartOptions" :data="chartData[0]" />
+      </div>
+      <div class="col-span-1">
+        <Pie :plugins="chartPlugin" :options="pieChartOptions" :data="chartData[1]" />
+      </div>
+    </div>
+    <Bar :plugins="chartPlugin" :options="chartOptions" :data="chartData[0]" />
   </div>
 </template>

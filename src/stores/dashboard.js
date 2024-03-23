@@ -14,12 +14,19 @@ const useDashboardStore = defineStore("dashboard", () => {
 
     const totalSaleOf30Days = ref(0);
     const totalProductOf30Days = ref(0);
+
     const totalUserOf30Days = ref(0);
 
-    const orders = ref([]);
+    const men = ref([]);
+    const women = ref([]);
+    const children = ref([]);
     const accounts = ref([]);
-    const prices = ref([]);
-    const quantities = ref([]);
+    const menPrices = ref([]);
+    const womenPrices = ref([]);
+    const childrenPrices = ref([]);
+    const menQuantities = ref([]);
+    const womenQuantities = ref([]);
+    const childrenQuantities = ref([]);
 
     const currentYear = ref(new Date().getFullYear())
     const endYear = ref(currentYear.value);
@@ -71,13 +78,31 @@ const useDashboardStore = defineStore("dashboard", () => {
             dateMove.setDate(dateMove.getDate() - 1);
         };
 
-        totalSaleOf30Days.value = dateArray
-            .map((date) => orders.value.filter((order) => checkDaysEqual(order.createdAt, date))
-                .reduce((prev, current) => prev + current.finalPrice, 0)).reduce((prev1, current1) => prev1 + current1, 0);
+        // total sale
+        let totalSaleOfMen30Days = dateArray
+            .map((date) => men.value.filter((item) => checkDaysEqual(item.order.createdAt, date))
+                .reduce((prev, current) => prev + current.variant.product.price, 0)).reduce((prev1, current1) => prev1 + current1, 0);
+        let totalSaleOfWomen30Days = dateArray
+            .map((date) => women.value.filter((item) => checkDaysEqual(item.order.createdAt, date))
+                .reduce((prev, current) => prev + current.variant.product.price, 0)).reduce((prev1, current1) => prev1 + current1, 0);
+        let totalSaleOfChildren30Days = dateArray
+            .map((date) => children.value.filter((item) => checkDaysEqual(item.order.createdAt, date))
+                .reduce((prev, current) => prev + current.variant.product.price, 0)).reduce((prev1, current1) => prev1 + current1, 0);
 
-        totalProductOf30Days.value = dateArray
-            .map((date) => orders.value.filter((order) => checkDaysEqual(order.createdAt, date))
-                .reduce((prev, current) => prev + current.OrderDetail.reduce((prev1, current1) => prev1 + current1.quantity, 0), 0)).reduce((prev2, current2) => prev2 + current2, 0);
+        totalSaleOf30Days.value = totalSaleOfMen30Days + totalSaleOfWomen30Days + totalSaleOfChildren30Days;
+
+        // total product
+        let totalProductOfMen30Days = dateArray
+            .map((date) => men.value.filter((item) => checkDaysEqual(item.order.createdAt, date))
+                .reduce((prev, current) => prev + current.quantity, 0)).reduce((prev1, current1) => prev1 + current1, 0);
+        let totalProductOfWomen30Days = dateArray
+            .map((date) => women.value.filter((item) => checkDaysEqual(item.order.createdAt, date))
+                .reduce((prev, current) => prev + current.quantity, 0)).reduce((prev1, current1) => prev1 + current1, 0);
+        let totalProductOfChildren30Days = dateArray
+            .map((date) => children.value.filter((item) => checkDaysEqual(item.order.createdAt, date))
+                .reduce((prev, current) => prev + current.quantity, 0)).reduce((prev1, current1) => prev1 + current1, 0);
+
+        totalProductOf30Days.value = totalProductOfMen30Days + totalProductOfWomen30Days + totalProductOfChildren30Days;
 
         totalUserOf30Days.value = dateArray
             .map((date) => accounts.value.filter((account) => checkDaysEqual(account.createdAt, date))
@@ -88,22 +113,34 @@ const useDashboardStore = defineStore("dashboard", () => {
     const totalPrice = computed(() => {
         switch (typeOptionIndex.value) {
             case 0:
-                return prices.value.slice(beginDateIndex.value, endDateIndex.value + 1).reduce((prev, current) => prev + current, 0);;
+                return menPrices.value.slice(beginDateIndex.value, endDateIndex.value + 1).reduce((prev, current) => prev + current, 0)
+                    + womenPrices.value.slice(beginDateIndex.value, endDateIndex.value + 1).reduce((prev, current) => prev + current, 0)
+                    + childrenPrices.value.slice(beginDateIndex.value, endDateIndex.value + 1).reduce((prev, current) => prev + current, 0);
             case 1:
-                return prices.value.slice(beginMonthIndex.value, endMonthIndex.value + 1).reduce((prev, current) => prev + current, 0);;
+                return menPrices.value.slice(beginMonthIndex.value, endMonthIndex.value + 1).reduce((prev, current) => prev + current, 0)
+                    + womenPrices.value.slice(beginMonthIndex.value, endMonthIndex.value + 1).reduce((prev, current) => prev + current, 0)
+                    + childrenPrices.value.slice(beginMonthIndex.value, endMonthIndex.value + 1).reduce((prev, current) => prev + current, 0);
             case 2:
-                return prices.value.slice(beginYear.value - currentYear.value + 4, endYear.value - currentYear.value + 5).reduce((prev, current) => prev + current, 0);;
+                return menPrices.value.slice(beginYear.value - currentYear.value + 4, endYear.value - currentYear.value + 5).reduce((prev, current) => prev + current, 0)
+                    + womenPrices.value.slice(beginYear.value - currentYear.value + 4, endYear.value - currentYear.value + 5).reduce((prev, current) => prev + current, 0)
+                    + childrenPrices.value.slice(beginYear.value - currentYear.value + 4, endYear.value - currentYear.value + 5).reduce((prev, current) => prev + current, 0);
         }
     });
 
     const totalQuantity = computed(() => {
         switch (typeOptionIndex.value) {
             case 0:
-                return quantities.value.slice(beginDateIndex.value, endDateIndex.value + 1).reduce((prev, current) => prev + current, 0);;
+                return menQuantities.value.slice(beginDateIndex.value, endDateIndex.value + 1).reduce((prev, current) => prev + current, 0)
+                    + womenQuantities.value.slice(beginDateIndex.value, endDateIndex.value + 1).reduce((prev, current) => prev + current, 0)
+                    + childrenQuantities.value.slice(beginDateIndex.value, endDateIndex.value + 1).reduce((prev, current) => prev + current, 0);
             case 1:
-                return quantities.value.slice(beginMonthIndex.value, endMonthIndex.value + 1).reduce((prev, current) => prev + current, 0);;
+                return menQuantities.value.slice(beginMonthIndex.value, endMonthIndex.value + 1).reduce((prev, current) => prev + current, 0)
+                    + womenQuantities.value.slice(beginMonthIndex.value, endMonthIndex.value + 1).reduce((prev, current) => prev + current, 0)
+                    + childrenQuantities.value.slice(beginMonthIndex.value, endMonthIndex.value + 1).reduce((prev, current) => prev + current, 0);
             case 2:
-                return quantities.value.slice(beginYear.value - currentYear.value + 4, endYear.value - currentYear.value + 5).reduce((prev, current) => prev + current, 0);;
+                return menQuantities.value.slice(beginYear.value - currentYear.value + 4, endYear.value - currentYear.value + 5).reduce((prev, current) => prev + current, 0)
+                    + womenQuantities.value.slice(beginYear.value - currentYear.value + 4, endYear.value - currentYear.value + 5).reduce((prev, current) => prev + current, 0)
+                    + childrenQuantities.value.slice(beginYear.value - currentYear.value + 4, endYear.value - currentYear.value + 5).reduce((prev, current) => prev + current, 0);
         }
     });
 
@@ -122,54 +159,110 @@ const useDashboardStore = defineStore("dashboard", () => {
     });
 
     const getFinalPriceDaily = () => {
-        prices.value = dates.value
-            .map((date) => orders.value.filter((order) => checkDaysEqual(order.createdAt, date))
-                .reduce((prev, current) => prev + current.finalPrice, 0));
+        // prices
+        menPrices.value = dates.value
+            .map((date) => men.value.filter((item) => checkDaysEqual(item.order.createdAt, date))
+                .reduce((prev, current) => prev + current.variant.product.price, 0));
+        womenPrices.value = dates.value
+            .map((date) => women.value.filter((item) => checkDaysEqual(item.order.createdAt, date))
+                .reduce((prev, current) => prev + current.variant.product.price, 0));
+        childrenPrices.value = dates.value
+            .map((date) => children.value.filter((item) => checkDaysEqual(item.order.createdAt, date))
+                .reduce((prev, current) => prev + current.variant.product.price, 0));
 
-
-        quantities.value = dates.value
-            .map((date) => orders.value.filter((order) => checkDaysEqual(order.createdAt, date))
-                .reduce((prev, current) => prev + current.OrderDetail.reduce((prev1, current1) => prev1 + current1.quantity, 0), 0));
+        // quantity
+        menQuantities.value = dates.value
+            .map((date) => men.value.filter((item) => checkDaysEqual(item.order.createdAt, date))
+                .reduce((prev, current) => prev + current.quantity, 0));
+        womenQuantities.value = dates.value
+            .map((date) => women.value.filter((item) => checkDaysEqual(item.order.createdAt, date))
+                .reduce((prev, current) => prev + current.quantity, 0));
+        childrenQuantities.value = dates.value
+            .map((date) => children.value.filter((item) => checkDaysEqual(item.order.createdAt, date))
+                .reduce((prev, current) => prev + current.quantity, 0));
     };
 
     const getFinalPriceMonthly = () => {
 
         const monthArray1 = Array.from({ length: 5 }, (value, index) => index + 8);
-        prices.value = monthArray1
-            .map((month) => orders.value.filter((order) => parseInt(order.createdAt.slice(5, 7)) == month && order.createdAt.slice(0, 4) == currentYear.value - 1)
-                .reduce((prev, current) => prev + current.finalPrice, 0));
-        quantities.value = monthArray1
-            .map((month) => orders.value.filter((order) => parseInt(order.createdAt.slice(5, 7)) == month && order.createdAt.slice(0, 4) == currentYear.value - 1)
-                .reduce((prev, current) => prev + current.OrderDetail.reduce((prev1, current1) => prev1 + current1.quantity, 0), 0));
+        // price
+        menPrices.value = monthArray1
+            .map((month) => men.value.filter((item) => parseInt(item.order.createdAt.slice(5, 7)) == month && item.order.createdAt.slice(0, 4) == currentYear.value - 1)
+                .reduce((prev, current) => prev + current.variant.product.price, 0));
+        womenPrices.value = monthArray1
+            .map((month) => women.value.filter((item) => parseInt(item.order.createdAt.slice(5, 7)) == month && item.order.createdAt.slice(0, 4) == currentYear.value - 1)
+                .reduce((prev, current) => prev + current.variant.product.price, 0));
+        childrenPrices.value = monthArray1
+            .map((month) => children.value.filter((item) => parseInt(item.order.createdAt.slice(5, 7)) == month && item.order.createdAt.slice(0, 4) == currentYear.value - 1)
+                .reduce((prev, current) => prev + current.variant.product.price, 0));
+
+        // quantity
+        menQuantities.value = monthArray1
+            .map((month) => men.value.filter((item) => parseInt(item.order.createdAt.slice(5, 7)) == month && item.order.createdAt.slice(0, 4) == currentYear.value - 1)
+                .reduce((prev, current) => prev + current.quantity, 0));
+        womenQuantities.value = monthArray1
+            .map((month) => women.value.filter((item) => parseInt(item.order.createdAt.slice(5, 7)) == month && item.order.createdAt.slice(0, 4) == currentYear.value - 1)
+                .reduce((prev, current) => prev + current.quantity, 0));
+        childrenQuantities.value = monthArray1
+            .map((month) => children.value.filter((item) => parseInt(item.order.createdAt.slice(5, 7)) == month && item.order.createdAt.slice(0, 4) == currentYear.value - 1)
+                .reduce((prev, current) => prev + current.quantity, 0));
 
         const monthArray = Array.from({ length: 12 }, (value, index) => index + 1);
-        prices.value = prices.value.concat(monthArray.map((month) => orders.value.filter((order) => order.createdAt.slice(5, 7) == month && order.createdAt.slice(0, 4) == currentYear.value).reduce((prev, current) => prev + current.finalPrice, 0)));
-        quantities.value = quantities.value.concat(monthArray.map((month) => orders.value.filter((order) => order.createdAt.slice(5, 7) == month && order.createdAt.slice(0, 4) == currentYear.value).reduce((prev, current) => prev + current.OrderDetail.reduce((prev1, current1) => prev1 + current1.quantity, 0), 0)));
+        // price
+        menPrices.value = menPrices.value.concat(monthArray.map((month) => men.value.filter((item) => item.order.createdAt.slice(5, 7) == month && item.order.createdAt.slice(0, 4) == currentYear.value).reduce((prev, current) => prev + current.variant.product.price, 0)));
+        womenPrices.value = womenPrices.value.concat(monthArray.map((month) => women.value.filter((item) => item.order.createdAt.slice(5, 7) == month && item.order.createdAt.slice(0, 4) == currentYear.value).reduce((prev, current) => prev + current.variant.product.price, 0)));
+        childrenPrices.value = childrenPrices.value.concat(monthArray.map((month) => children.value.filter((item) => item.order.createdAt.slice(5, 7) == month && item.order.createdAt.slice(0, 4) == currentYear.value).reduce((prev, current) => prev + current.variant.product.price, 0)));
+        // quantity
+        menQuantities.value = menQuantities.value.concat(monthArray.map((month) => men.value.filter((item) => item.order.createdAt.slice(5, 7) == month && item.order.createdAt.slice(0, 4) == currentYear.value).reduce((prev, current) => prev + current.quantity, 0)));
+        womenQuantities.value = womenQuantities.value.concat(monthArray.map((month) => women.value.filter((item) => item.order.createdAt.slice(5, 7) == month && item.order.createdAt.slice(0, 4) == currentYear.value).reduce((prev, current) => prev + current.quantity, 0)));
+        childrenQuantities.value = childrenQuantities.value.concat(monthArray.map((month) => children.value.filter((item) => item.order.createdAt.slice(5, 7) == month && item.order.createdAt.slice(0, 4) == currentYear.value).reduce((prev, current) => prev + current.quantity, 0)));
     };
 
     const getFinalPriceYearly = () => {
         const yearArray = Array.from({ length: 5 }, (value, index) => index + currentYear.value - 4);
-        prices.value = yearArray
-            .map((year) => orders.value.filter((order) => order.createdAt.slice(0, 4) == year)
-                .reduce((prev, current) => prev + current.finalPrice, 0));
-        quantities.value = yearArray
-            .map((year) => orders.value.filter((order) => order.createdAt.slice(0, 4) == year)
-                .reduce((prev, current) => prev + current.OrderDetail.reduce((prev1, current1) => prev1 + current1.quantity, 0), 0));
+        // price
+        menPrices.value = yearArray
+            .map((year) => men.value.filter((item) => item.order.createdAt.slice(0, 4) == year)
+                .reduce((prev, current) => prev + current.variant.product.price, 0));
+        womenPrices.value = yearArray
+            .map((year) => women.value.filter((item) => item.order.createdAt.slice(0, 4) == year)
+                .reduce((prev, current) => prev + current.variant.product.price, 0));
+        childrenPrices.value = yearArray
+            .map((year) => children.value.filter((item) => item.order.createdAt.slice(0, 4) == year)
+                .reduce((prev, current) => prev + current.variant.product.price, 0));
+        // quantity
+        menQuantities.value = yearArray
+            .map((year) => men.value.filter((item) => item.order.createdAt.slice(0, 4) == year)
+                .reduce((prev, current) => prev + current.quantity, 0));
+        womenQuantities.value = yearArray
+            .map((year) => women.value.filter((item) => item.order.createdAt.slice(0, 4) == year)
+                .reduce((prev, current) => prev + current.quantity, 0));
+        childrenQuantities.value = yearArray
+            .map((year) => children.value.filter((item) => item.order.createdAt.slice(0, 4) == year)
+                .reduce((prev, current) => prev + current.quantity, 0));
     };
 
     const fetchOrders = async () => {
         try {
-            const res = await orderService.getAllForReport();
-            orders.value = res.metadata;
 
-            const res1 = await accountService.getAllAccounts();
-            accounts.value = res1.metadata;
+            const res1 = await orderService.getMenForReport();
+            men.value = res1.metadata;
+
+            const res2 = await orderService.getWomenForReport();
+            women.value = res2.metadata;
+
+            const res3 = await orderService.getChildrenForReport();
+            children.value = res3.metadata;
+
+            const res4 = await accountService.getAllAccounts();
+            accounts.value = res4.metadata;
 
             getYears();
             getMonths();
             getDates();
             getFinalPriceMonthly();
             getReportOf30Days();
+            console.log("fetchOrders");
         } catch (error) {
             console.log(error);
         }
@@ -180,8 +273,12 @@ const useDashboardStore = defineStore("dashboard", () => {
         typeOptionIndex,
         typeOptions,
         fetchOrders,
-        prices,
-        quantities,
+        menPrices,
+        womenPrices,
+        childrenPrices,
+        menQuantities,
+        womenQuantities,
+        childrenQuantities,
         months,
         totalPrice,
         totalQuantity,

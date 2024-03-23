@@ -13,6 +13,18 @@ class OrderService {
     return (await this.api.get("/allForReport")).data;
   }
 
+  async getMenForReport() {
+    return (await this.api.get("/menForReport")).data;
+  }
+
+  async getWomenForReport() {
+    return (await this.api.get("/womenForReport")).data;
+  }
+
+  async getChildrenForReport() {
+    return (await this.api.get("/childrenForReport")).data;
+  }
+
   async getAllOrderStatus() {
     return (await this.api.get("/status-all")).data;
   }
