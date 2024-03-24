@@ -10,3 +10,4 @@ export { default as DashBoardIcon } from "./DashboardIcon.vue";
 export { default as ProductCategoryIcon } from "./ProductCategoryIcon.vue";
 export { default as ProductIcon } from "./ProductIcon.vue";
 export { default as OrderIcon } from "./OrderIcon.vue";
+export { default as GoogleIcon } from "./GoogleIcon.vue";

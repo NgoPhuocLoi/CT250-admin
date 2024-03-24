@@ -262,7 +262,6 @@ const useDashboardStore = defineStore("dashboard", () => {
             getDates();
             getFinalPriceMonthly();
             getReportOf30Days();
-            console.log("fetchOrders");
         } catch (error) {
             console.log(error);
         }

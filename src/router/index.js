@@ -8,14 +8,48 @@ import CouponsView from "@/views/coupon/CouponsView.vue";
 import CouponDetailView from "@/views/coupon/CouponDetailView.vue";
 import ProductDetailView from "@/views/product/ProductDetailView.vue";
 import Dashboard from "@/views/dashboard/Dashboard.vue";
+import CouponAddView from "@/views/coupon/CouponAddView.vue";
+import LoginForm from "@/components/auth/LoginForm.vue";
 
 import { createRouter, createWebHistory } from "vue-router";
-import CouponAddView from "@/views/coupon/CouponAddView.vue";
+import authService from "@/services/auth";
+import store, { useAccountStore, useLoadingStore } from "@/stores";
+
+const loadingStore = useLoadingStore(store);
+const accountStore = useAccountStore(store);
+
+const authenticateUser = async (to, from) => {
+  const accessToken = localStorage["accesstoken"];
+
+  if (!accessToken) return { name: "Login" };
+
+  console.log("authenticating user");
+
+  try {
+    loadingStore.startLoading();
+    const loggedInAccount = await authService.getLoggedInAccount(accessToken);
+    accountStore.setAccount(loggedInAccount.metadata);
+    console.log("authenticated user", loggedInAccount.metadata);
+    return true;
+  } catch (error) {
+    console.log(error);
+    return { name: "Login" };
+  } finally {
+    loadingStore.endLoading();
+  }
+};
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: "/dang-nhap",
+      component: LoginForm,
+      name: "Login",
+    },
+    {
       path: "/",
+      beforeEnter: authenticateUser,
       name: "",
       component: DefaultLayout,
       children: [
@@ -63,6 +97,10 @@ const router = createRouter({
       ],
     },
   ],
+  scrollBehavior(to, from, savedPosition) {
+    // always scroll to top
+    return { top: 0 };
+  },
 });
 
 export default router;
