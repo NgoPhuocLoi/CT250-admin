@@ -26,27 +26,33 @@ ChartJS.register(
   Legend
 );
 
-import ToggleButton from "@/components/dashboard/ToggleButton.vue";
-import DailyOption from "@/components/dashboard/DailyOption.vue";
-import MonthlyOption from "@/components/dashboard/MonthlyOption.vue";
-import YearlyOption from "@/components/dashboard/YearlyOption.vue";
-
 import { useDashboardStore } from "@/stores";
-
 const dashboardStore = useDashboardStore();
+
+import ReportHeader from "@/components/dashboard/ReportHeader.vue";
 
 onMounted(async () => {
   await dashboardStore.fetchOrders();
 });
+
+const sliceArray = (array, beginIndex, endIndex) => {
+  return array.slice(beginIndex, endIndex + 1);
+};
+
+const getPercentage = (dataArray, total) => {
+  return Number(((dataArray.reduce((a, b) => a + b, 0) / total) * 100).toFixed(2));
+};
 
 const chartData = computed(() => {
   let labelArray = [];
   let menSaleDataArray = [];
   let womenSaleDataArray = [];
   let childrenSaleDataArray = [];
+  let totalSaleDataArray = [];
   let menProductDataArray = [];
   let womenProductDataArray = [];
   let childrenProductDataArray = [];
+  let totalProductDataArray = [];
 
   let menSalePercentage = 0;
   let womenSalePercentage = 0;
@@ -56,231 +62,197 @@ const chartData = computed(() => {
   let womenProductPercentage = 0;
   let childrenProductPercentage = 0;
 
+  // fetch data
+  let beginIdx, endIdx;
+
   switch (dashboardStore.typeOptionIndex) {
     case 0:
-      labelArray = dashboardStore.dates.slice(
-        dashboardStore.beginDateIndex,
-        dashboardStore.endDateIndex + 1
-      );
-      // price
-      menSaleDataArray = dashboardStore.menPrices.slice(
-        dashboardStore.beginDateIndex,
-        dashboardStore.endDateIndex + 1
-      );
-      womenSaleDataArray = dashboardStore.womenPrices.slice(
-        dashboardStore.beginDateIndex,
-        dashboardStore.endDateIndex + 1
-      );
-      childrenSaleDataArray = dashboardStore.childrenPrices.slice(
-        dashboardStore.beginDateIndex,
-        dashboardStore.endDateIndex + 1
-      );
-      // quantity
-      menProductDataArray = dashboardStore.menQuantities.slice(
-        dashboardStore.beginDateIndex,
-        dashboardStore.endDateIndex + 1
-      );
-      womenProductDataArray = dashboardStore.womenQuantities.slice(
-        dashboardStore.beginDateIndex,
-        dashboardStore.endDateIndex + 1
-      );
-      childrenProductDataArray = dashboardStore.childrenQuantities.slice(
-        dashboardStore.beginDateIndex,
-        dashboardStore.endDateIndex + 1
-      );
+      beginIdx = dashboardStore.beginDateIndex;
+      endIdx = dashboardStore.endDateIndex;
+      labelArray = sliceArray(dashboardStore.dates, beginIdx, endIdx);
       break;
     case 1:
-      labelArray = dashboardStore.months.slice(
-        dashboardStore.beginMonthIndex,
-        dashboardStore.endMonthIndex + 1
-      );
-      // price
-      menSaleDataArray = dashboardStore.menPrices.slice(
-        dashboardStore.beginMonthIndex,
-        dashboardStore.endMonthIndex + 1
-      );
-      womenSaleDataArray = dashboardStore.womenPrices.slice(
-        dashboardStore.beginMonthIndex,
-        dashboardStore.endMonthIndex + 1
-      );
-      childrenSaleDataArray = dashboardStore.childrenPrices.slice(
-        dashboardStore.beginMonthIndex,
-        dashboardStore.endMonthIndex + 1
-      );
-      // quantity
-      menProductDataArray = dashboardStore.menQuantities.slice(
-        dashboardStore.beginMonthIndex,
-        dashboardStore.endMonthIndex + 1
-      );
-      womenProductDataArray = dashboardStore.womenQuantities.slice(
-        dashboardStore.beginMonthIndex,
-        dashboardStore.endMonthIndex + 1
-      );
-      childrenProductDataArray = dashboardStore.childrenQuantities.slice(
-        dashboardStore.beginMonthIndex,
-        dashboardStore.endMonthIndex + 1
-      );
+      beginIdx = dashboardStore.beginMonthIndex;
+      endIdx = dashboardStore.endMonthIndex;
+      labelArray = sliceArray(dashboardStore.months, beginIdx, endIdx);
       break;
     case 2:
-      labelArray = dashboardStore.years.slice(
-        dashboardStore.beginYear - dashboardStore.currentYear + 4,
-        dashboardStore.endYear - dashboardStore.currentYear + 5
-      );
-      // price
-      menSaleDataArray = dashboardStore.menPrices.slice(
-        dashboardStore.beginYear - dashboardStore.currentYear + 4,
-        dashboardStore.endYear - dashboardStore.currentYear + 5
-      );
-      womenSaleDataArray = dashboardStore.womenPrices.slice(
-        dashboardStore.beginYear - dashboardStore.currentYear + 4,
-        dashboardStore.endYear - dashboardStore.currentYear + 5
-      );
-      childrenSaleDataArray = dashboardStore.childrenPrices.slice(
-        dashboardStore.beginYear - dashboardStore.currentYear + 4,
-        dashboardStore.endYear - dashboardStore.currentYear + 5
-      );
-      // quantity
-      menProductDataArray = dashboardStore.menQuantities.slice(
-        dashboardStore.beginYear - dashboardStore.currentYear + 4,
-        dashboardStore.endYear - dashboardStore.currentYear + 5
-      );
-      womenProductDataArray = dashboardStore.womenQuantities.slice(
-        dashboardStore.beginYear - dashboardStore.currentYear + 4,
-        dashboardStore.endYear - dashboardStore.currentYear + 5
-      );
-      childrenProductDataArray = dashboardStore.childrenQuantities.slice(
-        dashboardStore.beginYear - dashboardStore.currentYear + 4,
-        dashboardStore.endYear - dashboardStore.currentYear + 5
-      );
+      beginIdx = dashboardStore.beginYear - dashboardStore.currentYear + 4;
+      endIdx = dashboardStore.endYear - dashboardStore.currentYear + 4;
+      labelArray = sliceArray(dashboardStore.years, beginIdx, endIdx);
       break;
   }
+
+  // price
+  menSaleDataArray = sliceArray(dashboardStore.menPrices, beginIdx, endIdx);
+  womenSaleDataArray = sliceArray(dashboardStore.womenPrices, beginIdx, endIdx);
+  childrenSaleDataArray = sliceArray(dashboardStore.childrenPrices, beginIdx, endIdx);
+  totalSaleDataArray = menSaleDataArray.map((value, index) => value + womenSaleDataArray[index] + childrenSaleDataArray[index]);
+  // quantity
+  menProductDataArray = sliceArray(dashboardStore.menQuantities, beginIdx, endIdx);
+  womenProductDataArray = sliceArray(dashboardStore.womenQuantities, beginIdx, endIdx);
+  childrenProductDataArray = sliceArray(dashboardStore.childrenQuantities, beginIdx, endIdx);
+  totalProductDataArray = menProductDataArray.map((value, index) => value + womenProductDataArray[index] + childrenProductDataArray[index]);
 
   // calculate data for pie-chart
   // sale
   let totalSale = menSaleDataArray.reduce((a, b) => a + b, 0) + womenSaleDataArray.reduce((a, b) => a + b, 0) + childrenSaleDataArray.reduce((a, b) => a + b, 0);
-  menSalePercentage = Number(((menSaleDataArray.reduce((a, b) => a + b, 0) / totalSale) * 100).toFixed(2));
-  womenSalePercentage = Number(((womenSaleDataArray.reduce((a, b) => a + b, 0) / totalSale) * 100).toFixed(2));
-  childrenSalePercentage = Number(((childrenSaleDataArray.reduce((a, b) => a + b, 0) / totalSale) * 100).toFixed(2));
+  menSalePercentage = getPercentage(menSaleDataArray, totalSale);
+  womenSalePercentage = getPercentage(womenSaleDataArray, totalSale);
+  childrenSalePercentage = getPercentage(childrenSaleDataArray, totalSale);
+
   // product
   let totalProduct = menProductDataArray.reduce((a, b) => a + b, 0) + womenProductDataArray.reduce((a, b) => a + b, 0) + childrenProductDataArray.reduce((a, b) => a + b, 0);
-  menProductPercentage = Number(((menProductDataArray.reduce((a, b) => a + b, 0) / totalProduct) * 100).toFixed(2));
-  womenProductPercentage = Number(((womenProductDataArray.reduce((a, b) => a + b, 0) / totalProduct) * 100).toFixed(2));
-  childrenProductPercentage = Number(((childrenProductDataArray.reduce((a, b) => a + b, 0) / totalProduct) * 100).toFixed(2));
+  menProductPercentage = getPercentage(menProductDataArray, totalProduct);
+  womenProductPercentage = getPercentage(womenProductDataArray, totalProduct);
+  childrenProductPercentage = getPercentage(childrenProductDataArray, totalProduct);
 
   const menColor = "#40A2E3";
   const womenColor = "#EE4266";
   const childrenColor = "#FF9800";
 
-  return dashboardStore.subjectIndex == 0
-    ? [
-      {
-        labels: labelArray,
-        datasets: [
-          {
-            label: "Nam",
-            borderColor: menColor,
-            backgroundColor: menColor,
-            fill: false,
-            data: menSaleDataArray,
-          },
-          {
-            label: "Nữ",
-            borderColor: womenColor,
-            backgroundColor: womenColor,
-            fill: false,
-            data: womenSaleDataArray,
-          },
-          {
-            label: "Trẻ em",
-            borderColor: childrenColor,
-            backgroundColor: childrenColor,
-            fill: false,
-            data: childrenSaleDataArray,
-          },
-        ],
-      },
-      {
-        labels: ["Nam", "Nữ", "Trẻ em"],
-        datasets: [
-          {
-            backgroundColor: [menColor, womenColor, childrenColor],
-            data: [menSalePercentage, womenSalePercentage, childrenSalePercentage],
-          },
-        ],
-      }
-    ]
-    : [
-      {
-        labels: labelArray,
-        datasets: [
-          {
-            label: "Nam",
-            borderColor: menColor,
-            backgroundColor: menColor,
-            fill: false,
-            data: menProductDataArray,
-          },
-          {
-            label: "Nữ",
-            borderColor: womenColor,
-            backgroundColor: womenColor,
-            fill: false,
-            data: womenProductDataArray,
-          },
-          {
-            label: "Trẻ em",
-            borderColor: childrenColor,
-            backgroundColor: childrenColor,
-            fill: false,
-            data: childrenProductDataArray,
-          },
-        ],
-      },
-      {
-        labels: ["Nam", "Nữ", "Trẻ em"],
-        datasets: [
-          {
-            backgroundColor: [menColor, womenColor, childrenColor],
-            data: [menProductPercentage, womenProductPercentage, childrenProductPercentage],
-          },
-        ],
-      }
-    ];
+  return [
+    {
+      labels: labelArray,
+      datasets: [
+        {
+          label: "Nam",
+          borderColor: menColor,
+          backgroundColor: menColor,
+          fill: false,
+          data: (dashboardStore.subjectIndex == 0) ? menSaleDataArray : menProductDataArray,
+        },
+        {
+          label: "Nữ",
+          borderColor: womenColor,
+          backgroundColor: womenColor,
+          fill: false,
+          data: (dashboardStore.subjectIndex == 0) ? womenSaleDataArray : womenProductDataArray,
+        },
+        {
+          label: "Trẻ em",
+          borderColor: childrenColor,
+          backgroundColor: childrenColor,
+          fill: false,
+          data: (dashboardStore.subjectIndex == 0) ? childrenSaleDataArray : childrenProductDataArray,
+        },
+      ],
+    },
+    {
+      labels: ["Nam", "Nữ", "Trẻ em"],
+      datasets: [
+        {
+          backgroundColor: [menColor, womenColor, childrenColor],
+          data: (dashboardStore.subjectIndex == 0) ?
+            [menSalePercentage, womenSalePercentage, childrenSalePercentage]
+            : [menProductPercentage, womenProductPercentage, childrenProductPercentage],
+        },
+      ],
+    },
+    {
+      labels: labelArray,
+      datasets: [
+        {
+          label: (dashboardStore.subjectIndex == 0) ? "Doanh thu" : "Sản phẩm",
+          borderColor: '#87A922',
+          backgroundColor: '#87A922',
+          fill: false,
+          data: (dashboardStore.subjectIndex == 0) ? totalSaleDataArray : totalProductDataArray,
+        }
+      ],
+    }
+  ]
 });
 
-const chartPlugin = ref([ChartDataLabels]);
+const legendMargin = {
+  beforeInit: function (chart) {
+    const fitValue = chart.legend.fit;
+    chart.legend.fit = function () {
+      fitValue.bind(chart.legend)();
+      return this.height += 40;
+    };
+  },
+}
+
+const chartPlugin = ref([ChartDataLabels, legendMargin]);
+
 ChartJS.defaults.font.size = 20;
-const chartOptions = ref({
-  layout: {
-    padding: 20,
-  },
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      display: true,
-      labels: {
-        font: { size: 20 },
+const chartOptions = computed(() => {
+  return {
+    layout: {
+      padding: 20,
+    },
+    scales: {
+      x: {
+        display: true,
+        title: {
+          display: true,
+          text: dashboardStore.typeOptionIndex == 0 ? 'Ngày' : dashboardStore.typeOptionIndex == 1 ? 'Tháng' : 'Năm',
+          color: '#911',
+          font: {
+            family: 'Courier New',
+            size: 20,
+            weight: 'bold',
+            lineHeight: 1.2,
+          },
+          padding: { top: 10, left: 0, right: 0, bottom: 0 }
+        }
+      },
+      y: {
+        min: 0,
+        ticks: {
+          stepSize: dashboardStore.subjectIndex == 0 ? 500000 : 1,
+        },
+        display: true,
+        title: {
+          display: true,
+          text: dashboardStore.subjectIndex == 0 ? 'Doanh thu' : 'Sản phẩm',
+          color: '#191',
+          font: {
+            family: 'Courier New',
+            size: 20,
+            weight: 'bold',
+            lineHeight: 1.2
+          },
+          padding: { top: 0, left: 0, right: 0, bottom: 10 }
+        }
+      }
+    },
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        labels: {
+          font: { size: 20 },
+        },
+      },
+      datalabels: {
+        anchor: "end",
+        align: "top",
+        formatter: function (value) {
+          return dashboardStore.subjectIndex == 0
+            ? new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            }).format(value)
+            : value;
+        },
+        color: "black",
+        font: {
+          size: 20,
+          weight: "bold",
+        },
       },
     },
-    datalabels: {
-      anchor: "end",
-      align: "top",
-      formatter: function (value) {
-        return dashboardStore.subjectIndex == 0
-          ? new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-          }).format(value)
-          : value;
-      },
-      color: "black",
-      font: {
-        size: 20,
-        weight: "bold",
-      },
-    },
-  },
+  }
+});
+
+const generalChartOptions = computed(() => {
+  return {
+    ...chartOptions.value,
+    lineTension: 0.35,
+  }
 });
 
 const pieChartOptions = ref({
@@ -298,7 +270,7 @@ const pieChartOptions = ref({
     },
     datalabels: {
       anchor: "end",
-      align: "top",
+      align: "start",
       formatter: function (value) {
         return value + "%";
       },
@@ -313,51 +285,27 @@ const pieChartOptions = ref({
 
 </script>
 <template>
-  <div class="h-[500px] flex flex-col gap-2">
-    <div class="flex justify-between">
-      <div class="flex gap-2 items-center">
-        <h2 class="uppercase text-xl font-bold text-black">Biểu đồ</h2>
-        <ToggleButton />
-      </div>
-      <div class="flex gap-8">
-        <div class="flex items-center justify-center gap-3">
-          <p>Định dạng:</p>
-          <select class="px-3 border rounded-md py-2 outline-none" v-model="dashboardStore.typeOptionIndex">
-            <option v-for="(option, index) in dashboardStore.typeOptions" :key="index" :value="index">
-              {{ option }}
-            </option>
-          </select>
+  <div class="flex flex-col gap-2">
+    <ReportHeader />
+    <div class="">
+      <div class="text-2xl text-[#EE4266] text-center">Thống kê theo danh mục sản phẩm</div>
+      <div class="grid grid-cols-3 w-full">
+        <div class="col-span-2 h-[600px]">
+          <Line :plugins="chartPlugin" :options="chartOptions" :data="chartData[0]" />
         </div>
-        <DailyOption v-if="dashboardStore.typeOptionIndex == 0" />
-        <MonthlyOption v-else-if="dashboardStore.typeOptionIndex == 1" />
-        <YearlyOption v-else />
+        <div class="col-span-1 h-[600px]">
+          <Pie :plugins="chartPlugin" :options="pieChartOptions" :data="chartData[1]" />
+        </div>
+      </div>
+      <div class="h-[600px]">
+        <Bar :plugins="chartPlugin" :options="chartOptions" :data="chartData[0]" />
       </div>
     </div>
-    <div v-if="dashboardStore.subjectIndex == 0" class="text-xl">
-      Tổng doanh thu:
-      <span class="text-[#3CCF4E] text-2xl font-bold">
-        {{
-            new Intl.NumberFormat("vi-VN", {
-              style: "currency",
-              currency: "VND",
-            }).format(dashboardStore.totalPrice)
-          }}
-      </span>
-    </div>
-    <div v-else>
-      Tổng sản phẩm đã bán:
-      <span class="text-[#3CCF4E] text-2xl font-bold">
-        {{ dashboardStore.totalQuantity }}
-      </span>
-    </div>
-    <div class="grid grid-cols-3 w-full">
-      <div class="col-span-2">
-        <Line :plugins="chartPlugin" :options="chartOptions" :data="chartData[0]" />
-      </div>
-      <div class="col-span-1">
-        <Pie :plugins="chartPlugin" :options="pieChartOptions" :data="chartData[1]" />
+    <div class="">
+      <div class="text-2xl text-[#EE4266] text-center">Thống kê chung</div>
+      <div class="h-[600px]">
+        <Line :plugins="chartPlugin" :options="generalChartOptions" :data="chartData[2]" />
       </div>
     </div>
-    <Bar :plugins="chartPlugin" :options="chartOptions" :data="chartData[0]" />
   </div>
 </template>

@@ -23,13 +23,10 @@ const authenticateUser = async (to, from) => {
 
   if (!accessToken) return { name: "Login" };
 
-  console.log("authenticating user");
-
   try {
     loadingStore.startLoading();
     const loggedInAccount = await authService.getLoggedInAccount(accessToken);
     accountStore.setAccount(loggedInAccount.metadata);
-    console.log("authenticated user", loggedInAccount.metadata);
     return true;
   } catch (error) {
     console.log(error);
