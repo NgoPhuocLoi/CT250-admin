@@ -25,7 +25,8 @@ const handleLogout = () => {
   <div class="relative" ref="target">
     <router-link class="flex items-center gap-4" to="" @click.prevent="dropdownOpen = !dropdownOpen">
       <span class="hidden text-right lg:block">
-        <span class="block text-sm font-medium text-black dark:text-white">{{ (accountStore.account.roleId == 1) ? "Admin" : "Nhân viên"  }}</span>
+        <span class="block text-sm font-medium text-black dark:text-white">{{ (accountStore.account.roleId == 1) ?
+      "Admin" : "Nhân viên" }}</span>
         <span class="block text-xs font-medium">{{ accountStore.account.fullName }}</span>
       </span>
 
@@ -49,7 +50,7 @@ const handleLogout = () => {
       class="absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
       <ul class="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
         <li>
-          <router-link to="/profile"
+          <router-link to="/tai-khoan"
             class="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
             <svg class="fill-current" width="22" height="22" viewBox="0 0 22 22" fill="none"
               xmlns="http://www.w3.org/2000/svg">
@@ -60,7 +61,7 @@ const handleLogout = () => {
                 d="M17.7719 21.4156H4.2281C3.5406 21.4156 2.9906 20.8656 2.9906 20.1781V17.0844C2.9906 13.7156 5.7406 10.9656 9.10935 10.9656H12.925C16.2937 10.9656 19.0437 13.7156 19.0437 17.0844V20.1781C19.0094 20.8312 18.4594 21.4156 17.7719 21.4156ZM4.53748 19.8687H17.4969V17.0844C17.4969 14.575 15.4344 12.5125 12.925 12.5125H9.07498C6.5656 12.5125 4.5031 14.575 4.5031 17.0844V19.8687H4.53748Z"
                 fill="" />
             </svg>
-            My Profile
+            Thông tin cá nhân
           </router-link>
         </li>
         <li>

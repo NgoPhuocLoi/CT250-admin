@@ -9,3 +9,5 @@ export { default as useProductStore } from "./product";
 export { default as useDashboardStore } from "./dashboard";
 export { default as useLoadingStore } from "./loading";
 export { default as useAccountStore } from "./account";
+export { default as useAddressStore } from "./address";
+export { default as useWindowSizeStore } from "./windowSize";

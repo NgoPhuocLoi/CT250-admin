@@ -10,6 +10,9 @@ import ProductDetailView from "@/views/product/ProductDetailView.vue";
 import Dashboard from "@/views/dashboard/Dashboard.vue";
 import CouponAddView from "@/views/coupon/CouponAddView.vue";
 import LoginForm from "@/components/auth/LoginForm.vue";
+import ProfileLayout from "@/layouts/ProfileLayout.vue";
+import UserInfo from "@/components/profile/UserInfo.vue";
+import UserAddresses from "@/components/profile/UserAddresses.vue";
 
 import { createRouter, createWebHistory } from "vue-router";
 import authService from "@/services/auth";
@@ -90,6 +93,20 @@ const router = createRouter({
         {
           path: "ma-giam-gia/them",
           component: CouponAddView,
+        },
+        {
+          path: "tai-khoan",
+          component: ProfileLayout,
+          children: [
+            {
+              path: "thong-tin-ca-nhan",
+              component: UserInfo,
+            },
+            {
+              path: "so-dia-chi",
+              component: UserAddresses,
+            },
+          ],
         },
       ],
     },
