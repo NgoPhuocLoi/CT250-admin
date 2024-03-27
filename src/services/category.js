@@ -17,6 +17,10 @@ class CategoryService {
     return (await this.api.get(`/parent/${id}`)).data;
   }
 
+  async getChildren(id) {
+    return (await this.api.get(`/children/${id}`)).data;
+  }
+
 }
 
 export default new CategoryService();

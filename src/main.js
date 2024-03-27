@@ -1,4 +1,6 @@
 import "./assets/base.css";
+import "primevue/resources/themes/aura-light-green/theme.css";
+import 'primeicons/primeicons.css'
 
 import { createApp } from "vue";
 
@@ -7,6 +9,7 @@ import store from "./stores";
 import router from "./router";
 import CKEditor from "@ckeditor/ckeditor5-vue";
 import Swal from "sweetalert2";
+import PrimeVue from 'primevue/config';
 window.Swal = Swal;
 
 const Toast = Swal.mixin({
@@ -27,5 +30,6 @@ const app = createApp(App);
 app.use(store);
 app.use(router);
 app.use(CKEditor);
+app.use(PrimeVue);
 
 app.mount("#app");

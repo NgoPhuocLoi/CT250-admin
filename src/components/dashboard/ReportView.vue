@@ -30,9 +30,14 @@ import { useDashboardStore } from "@/stores";
 const dashboardStore = useDashboardStore();
 
 import ReportHeader from "@/components/dashboard/ReportHeader.vue";
+import ChartSkeleton from "@/components/skeleton/ChartSkeleton.vue";
+
+const fetchingData = ref(false);
 
 onMounted(async () => {
+  fetchingData.value = true;
   await dashboardStore.fetchOrders();
+  fetchingData.value = false;
 });
 
 const sliceArray = (array, beginIndex, endIndex) => {
@@ -291,20 +296,24 @@ const pieChartOptions = ref({
       <div class="text-2xl text-[#EE4266] text-center">Thống kê theo danh mục sản phẩm</div>
       <div class="grid grid-cols-3 w-full">
         <div class="col-span-2 h-[600px]">
-          <Line :plugins="chartPlugin" :options="chartOptions" :data="chartData[0]" />
+          <ChartSkeleton v-if="fetchingData" />
+          <Line v-else :plugins="chartPlugin" :options="chartOptions" :data="chartData[0]" />
         </div>
         <div class="col-span-1 h-[600px]">
-          <Pie :plugins="chartPlugin" :options="pieChartOptions" :data="chartData[1]" />
+          <ChartSkeleton v-if="fetchingData" />
+          <Pie v-else :plugins="chartPlugin" :options="pieChartOptions" :data="chartData[1]" />
         </div>
       </div>
       <div class="h-[600px]">
-        <Bar :plugins="chartPlugin" :options="chartOptions" :data="chartData[0]" />
+        <ChartSkeleton v-if="fetchingData" />
+        <Bar v-else :plugins="chartPlugin" :options="chartOptions" :data="chartData[0]" />
       </div>
     </div>
     <div class="">
       <div class="text-2xl text-[#EE4266] text-center">Thống kê chung</div>
       <div class="h-[600px]">
-        <Line :plugins="chartPlugin" :options="generalChartOptions" :data="chartData[2]" />
+        <ChartSkeleton v-if="fetchingData" />
+        <Line v-else :plugins="chartPlugin" :options="generalChartOptions" :data="chartData[2]" />
       </div>
     </div>
   </div>
