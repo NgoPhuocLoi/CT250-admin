@@ -1,7 +1,6 @@
 <script setup>
 import ProductTable from "@/components/product//ProductTable.vue";
 import Breadcrumb from "@/components/common/Breadcrumb.vue";
-import TempTable from "@/components/product/TempTable.vue";
 </script>
 <template>
   <Breadcrumb page-title="Sản phẩm" />
@@ -11,6 +10,5 @@ import TempTable from "@/components/product/TempTable.vue";
       Thêm sản phẩm
     </router-link>
   </div>
-  <!-- <ProductTable /> -->
-  <TempTable />
+  <ProductTable />
 </template>

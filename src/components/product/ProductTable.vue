@@ -1,137 +1,205 @@
 <script setup>
 import { onMounted, ref, watch } from "vue";
 import productService from "@/services/product";
-import { useRoute } from "vue-router";
+import categoryService from "@/services/category";
 
-const route = useRoute();
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import Tag from 'primevue/tag';
+import Dropdown from 'primevue/dropdown';
+import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
+import Button from 'primevue/button';
+import { FilterMatchMode } from 'primevue/api';
+
+import TableSkeleton from "@/components/skeleton/TableSkeleton.vue";
 
 const products = ref([]);
+const menCategoryIds = ref([]);
+const womenCategoryIds = ref([]);
+const childrenCategoryIds = ref([]);
+const fetchingProducts = ref(false);
 
-const sortOption = ref("Tất cả");
-const options = ref(["Tất cả", "Hiển thị", "Không hiển thị"]);
+const filters = ref({});
 
-watch(
-  () => route.params,
-  async () => {
-    await fetchProducts();
-  }
-);
-
-const totalQuantity = (variants) => {
-  return variants.reduce((total, variant) => {
-    return total + variant.quantity;
-  }, 0);
+const initFilters = () => {
+    filters.value = {
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        id: { value: null, matchMode: FilterMatchMode.EQUALS },
+        name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        rootCategory: { value: null, matchMode: FilterMatchMode.EQUALS },
+        price: { value: null, matchMode: FilterMatchMode.EQUALS },
+        quantity: { value: null, matchMode: FilterMatchMode.EQUALS },
+        visibility: { value: null, matchMode: FilterMatchMode.EQUALS },
+    };
 };
 
+const clearFilter = () => {
+    initFilters();
+};
+
+initFilters();
+
 onMounted(async () => {
-  await fetchProducts();
+    await fetchProducts();
 });
 
 const fetchProducts = async () => {
-  try {
-    const res = await productService.getByCategories({
-      type: "All",
-      limit: 10,
-    });
-    products.value = res.metadata;
-  } catch (error) {
-    console.log(error);
-  }
+    fetchingProducts.value = true;
+    try {
+        const res = await productService.getByCategories({
+            type: "All",
+            limit: 100,
+        });
+
+        // category 
+        const menIdArray = await categoryService.getChildren(1);
+        menCategoryIds.value = menIdArray.metadata;
+        const womenIdArray = await categoryService.getChildren(3);
+        womenCategoryIds.value = womenIdArray.metadata;
+        const childrenIdArray = await categoryService.getChildren(2);
+        childrenCategoryIds.value = childrenIdArray.metadata;
+
+        // get root category and quantity
+        let productArray = res.metadata.products.map(async (product) => {
+            let rootCategory = menCategoryIds.value.includes(product.categoryId) ? "Nam" : womenCategoryIds.value.includes(product.categoryId) ? "Nữ" : "Trẻ em";
+            let quantity = product.variants.reduce((total, variant) => {
+                return total + variant.quantity;
+            }, 0);
+            return { ...product, rootCategory, quantity, visibility: product.visible === true ? 'Hiển thị' : 'Không hiển thị' }
+        })
+
+        products.value = await Promise.all(productArray);
+
+    } catch (error) {
+        console.log(error);
+    } finally {
+        fetchingProducts.value = false;
+    }
 };
+
+const selectedProduct = ref();
+const metaKey = ref(true);
+
+const columnList = [{
+    header: "Mã sản phẩm",
+    sortable: true,
+},
+{
+    header: "Hình ảnh",
+    sortable: false,
+},
+{
+    header: "Tên sản phẩm",
+    sortable: true,
+},
+{
+    header: "Danh mục",
+    sortable: true,
+},
+{
+    header: "Giá (VND)",
+    sortable: true,
+},
+{
+    header: "Số lượng",
+    sortable: true,
+},
+{
+    header: "Trạng thái",
+    sortable: true,
+}];
+
 </script>
-
 <template>
-  <div class="rounded-sm border border-stroke bg-white shadow-default">
-    <!-- Table Header -->
-    <div class="grid grid-cols-8 border-t border-stroke py-4.5 px-4 sm:grid-cols-8 md:px-6 2xl:px-7.5">
-      <div class="col-span-1 flex mt-7">
-        <div class="flex items-center">
-          <input id="checkbox-table-search-1" type="checkbox"
-            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-          <label for="checkbox-table-search-1" class="sr-only">checkbox</label>
-        </div>
-      </div>
-      <div class="col-span-1 flex flex-col items-center justify-center gap-2">
-        <p class="font-medium">Mã sản phẩm</p>
-        <input type="text" class="px-3 border rounded-md py-2 outline-none w-[90%]" placeholder="Mã sản phẩm" />
-      </div>
-      <div class="col-span-2 flex flex-col items-center justify-center gap-2">
-        <p class="font-medium">Tên sản phẩm</p>
-        <input type="text" class="px-3 border rounded-md py-2 outline-none w-[90%]" placeholder="Tên sản phẩm" />
-      </div>
-      <div class="col-span-1 flex flex-col items-center justify-center gap-2">
-        <p class="font-medium">Danh mục</p>
-        <input type="text" class="px-3 border rounded-md py-2 outline-none w-[90%]" placeholder="Danh mục" />
-      </div>
-      <div class="col-span-1 flex flex-col items-center justify-center gap-2">
-        <p class="font-medium">Giá (VND)</p>
-        <div class="flex gap-1 px-1">
-          <input type="text" class="px-3 border rounded-md py-2 outline-none w-[90%]" placeholder="Từ" />
-          <input type="text" class="px-3 border rounded-md py-2 outline-none w-[90%]" placeholder="Đến" />
-        </div>
-      </div>
-      <div class="col-span-1 flex flex-col items-center justify-center gap-2">
-        <p class="font-medium">Số lượng</p>
-        <div class="flex gap-1 px-1">
-          <input type="text" class="px-3 border rounded-md py-2 outline-none w-[90%]" placeholder="Từ" />
-          <input type="text" class="px-3 border rounded-md py-2 outline-none w-[90%]" placeholder="Đến" />
-        </div>
-      </div>
-      <div class="col-span-1 flex flex-col items-center justify-center gap-2">
-        <p class="font-medium">Trạng thái</p>
-        <select class="px-3 border rounded-md py-2 outline-none w-[90%]" v-model="sortOption">
-          <option v-for="(option, index) in options" :key="index" :value="option">
-            {{ option }}
-          </option>
-        </select>
-      </div>
+    <div class="card">
+        <TableSkeleton :columnList="columnList" v-if="fetchingProducts" />
+        <DataTable v-else v-model:selection="selectedProduct" dataKey="id" stripedRows v-model:filters="filters" :value="products" filterDisplay="row"
+            :loading="fetchingProducts" :globalFilterFields="['id', 'name', 'rootCategory']" sortMode="multiple"
+            paginator resizableColumns columnResizeMode="fit"
+            paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
+            currentPageReportTemplate="{first} đến {last} trong tổng số {totalRecords}" :rows="5"
+            :rowsPerPageOptions="[5, 10, 15, 20]" tableStyle="min-width: 50rem">
+            <template #header>
+                <div class="flex justify-between">
+                    <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined @click="clearFilter()" />
+                    <span class="relative">
+                        <i class="pi pi-search absolute top-2/4 -mt-2 left-3 text-surface-400 dark:text-surface-600" />
+                        <InputText v-model="filters['global'].value" placeholder="Nhập từ khóa tìm kiếm..."
+                            class="pl-10 font-normal" />
+                    </span>
+                </div>
+            </template>
+            <template #empty> Không có sản phẩm nào. </template>
+            <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+            <Column field="id" header="Mã sản phẩm" sortable>
+                <template #body="slotProps">
+                    <RouterLink :to="`/san-pham/${slotProps.data.id}`"
+                        class="text-sm font-bold underline-offset-2 underline text-black mx-auto">
+                        #{{ slotProps.data.id }}
+                    </RouterLink>
+                </template>
+                <template #filter="{ filterModel, filterCallback }">
+                    <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"
+                        placeholder="Theo mã" />
+                </template>
+            </Column>
+            <Column header="Hình ảnh">
+                <template #body="slotProps">
+                    <img class="w-[6rem] shadow-md rounded" :src="slotProps.data.colors[0].productImage.image.path" />
+                </template>
+            </Column>
+            <Column field="name" header="Tên sản phẩm" sortable>
+                <template #filter="{ filterModel, filterCallback }">
+                    <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"
+                        placeholder="Tìm theo tên sản phẩm" />
+                </template>
+            </Column>
+            <Column field="rootCategory" header="Danh mục" sortable>
+                <template #filter="{ filterModel, filterCallback }">
+                    <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="['Nam', 'Nữ', 'Trẻ em']"
+                        placeholder="Chọn một" class="p-column-filter" :showClear="true">
+                        <template #option="slotProps">
+                            <Tag :value="slotProps.option"
+                                :severity="slotProps.option === 'Nam' ? 'info' : slotProps.option === 'Nữ' ? 'danger' : 'warning'" />
+                        </template>
+                    </Dropdown>
+                </template>
+            </Column>
+            <Column field="price" header="Giá (VND)" dataType="numeric" sortable>
+                <template #body="slotProps">
+                    {{ new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        }).format(slotProps.data.price) }}
+                </template>
+                <template #filter="{ filterModel, filterCallback }">
+                    <InputNumber v-model="filterModel.value" @keydown.enter="filterCallback()" class="p-column-filter"
+                        placeholder="Lọc theo giá" />
+                </template>
+            </Column>
+            <Column field="quantity" header="Số lượng" dataType="numeric" sortable>
+                <template #filter="{ filterModel, filterCallback }">
+                    <InputNumber v-model="filterModel.value" @keydown.enter="filterCallback()" class="p-column-filter"
+                        placeholder="Lọc theo số lượng" />
+                </template>
+            </Column>
+            <Column field="visibility" header="Trạng thái" sortable>
+                <template #body="slotProps">
+                    <Tag :value="slotProps.data.visibility"
+                        :severity="slotProps.data.visibility === 'Hiển thị' ? 'success' : 'warning'" />
+                </template>
+                <template #filter="{ filterModel, filterCallback }">
+                    <Dropdown v-model="filterModel.value" @change="filterCallback()"
+                        :options="['Hiển thị', 'Không hiển thị']" placeholder="Chọn một" class="p-column-filter"
+                        :showClear="true">
+                        <template #option="slotProps">
+                            <Tag :value="slotProps.option"
+                                :severity="slotProps.option === 'Hiển thị' ? 'success' : 'warning'" />
+                        </template>
+                    </Dropdown>
+                </template>
+            </Column>
+        </DataTable>
     </div>
-
-    <!-- Table Rows -->
-    <div v-for="product in products" :key="product.id">
-      <div class="grid grid-cols-8 border-t border-stroke py-4.5 px-4 sm:grid-cols-8 md:px-6 2xl:px-7.5">
-        <div class="col-span-1 flex items-center">
-          <div class="w-[30%] flex items-center">
-            <input id="checkbox-table-search-1" type="checkbox"
-              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-            <label for="checkbox-table-search-1" class="sr-only">checkbox</label>
-          </div>
-          <div class="w-[65%]">
-            <img class="w-full" :src="product.colors[0].productImage.image.path" />
-          </div>
-        </div>
-        <div class="col-span-1 hidden items-center justify-center sm:flex">
-          <RouterLink :to="`/san-pham/${product.id}`"
-            class="text-sm font-bold underline-offset-2 underline text-black mx-auto">
-            #{{ product.id }}
-          </RouterLink>
-        </div>
-        <div class="col-span-2 flex items-center">
-          <p class="text-sm font-medium text-black pl-5">
-            {{ product.name }}
-          </p>
-        </div>
-        <div class="col-span-1 hidden items-center justify-center sm:flex">
-          <p class="text-sm font-medium text-black">
-            {{ product.categoryId }}
-          </p>
-        </div>
-        <div class="col-span-1 hidden items-center justify-center sm:flex">
-          <p class="text-sm font-medium text-black">
-            <span>{{ new Intl.NumberFormat().format(product.price) }}</span>
-          </p>
-        </div>
-        <div class="col-span-1 hidden items-center justify-center sm:flex">
-          <p class="text-sm font-medium text-black">
-            {{ totalQuantity(product.variants) }}
-          </p>
-        </div>
-        <div class="col-span-1 hidden items-center justify-center sm:flex">
-          <p class="text-sm font-medium text-black">
-            {{ product.visible ? "Hiển thị" : "Không hiển thị" }}
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
 </template>
