@@ -81,13 +81,13 @@ const useDashboardStore = defineStore("dashboard", () => {
         // total sale
         let totalSaleOfMen30Days = dateArray
             .map((date) => men.value.filter((item) => checkDaysEqual(item.order.createdAt, date))
-                .reduce((prev, current) => prev + current.variant.product.price, 0)).reduce((prev1, current1) => prev1 + current1, 0);
+                .reduce((prev, current) => prev + current.variant.product.price*current.quantity, 0)).reduce((prev1, current1) => prev1 + current1, 0);
         let totalSaleOfWomen30Days = dateArray
             .map((date) => women.value.filter((item) => checkDaysEqual(item.order.createdAt, date))
-                .reduce((prev, current) => prev + current.variant.product.price, 0)).reduce((prev1, current1) => prev1 + current1, 0);
+                .reduce((prev, current) => prev + current.variant.product.price*current.quantity, 0)).reduce((prev1, current1) => prev1 + current1, 0);
         let totalSaleOfChildren30Days = dateArray
             .map((date) => children.value.filter((item) => checkDaysEqual(item.order.createdAt, date))
-                .reduce((prev, current) => prev + current.variant.product.price, 0)).reduce((prev1, current1) => prev1 + current1, 0);
+                .reduce((prev, current) => prev + current.variant.product.price*current.quantity, 0)).reduce((prev1, current1) => prev1 + current1, 0);
 
         totalSaleOf30Days.value = totalSaleOfMen30Days + totalSaleOfWomen30Days + totalSaleOfChildren30Days;
 
@@ -162,13 +162,13 @@ const useDashboardStore = defineStore("dashboard", () => {
         // prices
         menPrices.value = dates.value
             .map((date) => men.value.filter((item) => checkDaysEqual(item.order.createdAt, date))
-                .reduce((prev, current) => prev + current.variant.product.price, 0));
+                .reduce((prev, current) => prev + current.variant.product.price*current.quantity, 0));
         womenPrices.value = dates.value
             .map((date) => women.value.filter((item) => checkDaysEqual(item.order.createdAt, date))
-                .reduce((prev, current) => prev + current.variant.product.price, 0));
+                .reduce((prev, current) => prev + current.variant.product.price*current.quantity, 0));
         childrenPrices.value = dates.value
             .map((date) => children.value.filter((item) => checkDaysEqual(item.order.createdAt, date))
-                .reduce((prev, current) => prev + current.variant.product.price, 0));
+                .reduce((prev, current) => prev + current.variant.product.price*current.quantity, 0));
 
         // quantity
         menQuantities.value = dates.value
@@ -188,13 +188,13 @@ const useDashboardStore = defineStore("dashboard", () => {
         // price
         menPrices.value = monthArray1
             .map((month) => men.value.filter((item) => parseInt(item.order.createdAt.slice(5, 7)) == month && item.order.createdAt.slice(0, 4) == currentYear.value - 1)
-                .reduce((prev, current) => prev + current.variant.product.price, 0));
+                .reduce((prev, current) => prev + current.variant.product.price*current.quantity, 0));
         womenPrices.value = monthArray1
             .map((month) => women.value.filter((item) => parseInt(item.order.createdAt.slice(5, 7)) == month && item.order.createdAt.slice(0, 4) == currentYear.value - 1)
-                .reduce((prev, current) => prev + current.variant.product.price, 0));
+                .reduce((prev, current) => prev + current.variant.product.price*current.quantity, 0));
         childrenPrices.value = monthArray1
             .map((month) => children.value.filter((item) => parseInt(item.order.createdAt.slice(5, 7)) == month && item.order.createdAt.slice(0, 4) == currentYear.value - 1)
-                .reduce((prev, current) => prev + current.variant.product.price, 0));
+                .reduce((prev, current) => prev + current.variant.product.price*current.quantity, 0));
 
         // quantity
         menQuantities.value = monthArray1
@@ -209,9 +209,9 @@ const useDashboardStore = defineStore("dashboard", () => {
 
         const monthArray = Array.from({ length: 12 }, (value, index) => index + 1);
         // price
-        menPrices.value = menPrices.value.concat(monthArray.map((month) => men.value.filter((item) => item.order.createdAt.slice(5, 7) == month && item.order.createdAt.slice(0, 4) == currentYear.value).reduce((prev, current) => prev + current.variant.product.price, 0)));
-        womenPrices.value = womenPrices.value.concat(monthArray.map((month) => women.value.filter((item) => item.order.createdAt.slice(5, 7) == month && item.order.createdAt.slice(0, 4) == currentYear.value).reduce((prev, current) => prev + current.variant.product.price, 0)));
-        childrenPrices.value = childrenPrices.value.concat(monthArray.map((month) => children.value.filter((item) => item.order.createdAt.slice(5, 7) == month && item.order.createdAt.slice(0, 4) == currentYear.value).reduce((prev, current) => prev + current.variant.product.price, 0)));
+        menPrices.value = menPrices.value.concat(monthArray.map((month) => men.value.filter((item) => item.order.createdAt.slice(5, 7) == month && item.order.createdAt.slice(0, 4) == currentYear.value).reduce((prev, current) => prev + current.variant.product.price*current.quantity, 0)));
+        womenPrices.value = womenPrices.value.concat(monthArray.map((month) => women.value.filter((item) => item.order.createdAt.slice(5, 7) == month && item.order.createdAt.slice(0, 4) == currentYear.value).reduce((prev, current) => prev + current.variant.product.price*current.quantity, 0)));
+        childrenPrices.value = childrenPrices.value.concat(monthArray.map((month) => children.value.filter((item) => item.order.createdAt.slice(5, 7) == month && item.order.createdAt.slice(0, 4) == currentYear.value).reduce((prev, current) => prev + current.variant.product.price*current.quantity, 0)));
         // quantity
         menQuantities.value = menQuantities.value.concat(monthArray.map((month) => men.value.filter((item) => item.order.createdAt.slice(5, 7) == month && item.order.createdAt.slice(0, 4) == currentYear.value).reduce((prev, current) => prev + current.quantity, 0)));
         womenQuantities.value = womenQuantities.value.concat(monthArray.map((month) => women.value.filter((item) => item.order.createdAt.slice(5, 7) == month && item.order.createdAt.slice(0, 4) == currentYear.value).reduce((prev, current) => prev + current.quantity, 0)));
@@ -223,13 +223,13 @@ const useDashboardStore = defineStore("dashboard", () => {
         // price
         menPrices.value = yearArray
             .map((year) => men.value.filter((item) => item.order.createdAt.slice(0, 4) == year)
-                .reduce((prev, current) => prev + current.variant.product.price, 0));
+                .reduce((prev, current) => prev + current.variant.product.price*current.quantity, 0));
         womenPrices.value = yearArray
             .map((year) => women.value.filter((item) => item.order.createdAt.slice(0, 4) == year)
-                .reduce((prev, current) => prev + current.variant.product.price, 0));
+                .reduce((prev, current) => prev + current.variant.product.price*current.quantity, 0));
         childrenPrices.value = yearArray
             .map((year) => children.value.filter((item) => item.order.createdAt.slice(0, 4) == year)
-                .reduce((prev, current) => prev + current.variant.product.price, 0));
+                .reduce((prev, current) => prev + current.variant.product.price*current.quantity, 0));
         // quantity
         menQuantities.value = yearArray
             .map((year) => men.value.filter((item) => item.order.createdAt.slice(0, 4) == year)
