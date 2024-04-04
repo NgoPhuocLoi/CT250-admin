@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 import productService from "@/services/product";
 import categoryService from "@/services/category";
 
@@ -19,8 +19,9 @@ const menCategoryIds = ref([]);
 const womenCategoryIds = ref([]);
 const childrenCategoryIds = ref([]);
 const fetchingProducts = ref(false);
-
 const filters = ref({});
+const selectedProducts = ref([]);
+const metaKey = ref(true);
 
 const initFilters = () => {
     filters.value = {
@@ -78,9 +79,6 @@ const fetchProducts = async () => {
     }
 };
 
-const selectedProduct = ref();
-const metaKey = ref(true);
-
 const columnList = [{
     header: "Mã sản phẩm",
     sortable: true,
@@ -114,9 +112,10 @@ const columnList = [{
 <template>
     <div class="card">
         <TableSkeleton :columnList="columnList" v-if="fetchingProducts" />
-        <DataTable v-else v-model:selection="selectedProduct" dataKey="id" stripedRows v-model:filters="filters" :value="products" filterDisplay="row"
-            :loading="fetchingProducts" :globalFilterFields="['id', 'name', 'rootCategory']" sortMode="multiple"
-            paginator resizableColumns columnResizeMode="fit"
+        <DataTable v-else v-model:selection="selectedProducts" dataKey="id" stripedRows v-model:filters="filters"
+            :value="products" filterDisplay="row" :loading="fetchingProducts"
+            :globalFilterFields="['id', 'name', 'rootCategory']" sortMode="multiple" paginator resizableColumns
+            columnResizeMode="fit"
             paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
             currentPageReportTemplate="{first} đến {last} trong tổng số {totalRecords}" :rows="5"
             :rowsPerPageOptions="[5, 10, 15, 20]" tableStyle="min-width: 50rem">
