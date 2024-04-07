@@ -19,9 +19,15 @@ async function fetchProductInformation() {
     const res1 = await productService.getOneById(route.params.productId);
     productStore.setNewProduct({ ...res1.metadata });
 
-    const res2 = await categoryService.getRootParent(productStore.newProduct.categoryId);
-    productStore.setParentCategoryId(res2.metadata.id);
-
+    const res2 = await categoryService.getOne(productStore.newProduct.categoryId);
+    productStore.setSelectedCategory({
+      id: res2.metadata.id,
+      name: res2.metadata.name,
+      slug: res2.metadata.slug,
+      parentId: res2.metadata.parentId,
+      createdAt: res2.metadata.createdAt,
+      updatedAt: res2.metadata.updatedAt,
+    });
     productStore.setImages(productStore.newProduct.images.map((img) => {
       return {
         file: { name: img.image.filename },

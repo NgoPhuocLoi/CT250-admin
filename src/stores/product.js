@@ -1,18 +1,16 @@
 import { defineStore } from "pinia";
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import * as yup from "yup";
-import categoryService from "@/services/category";
 
 const useProductStore = defineStore("product", () => {
   const newProduct = ref({ visible: true });
-  const parentCategoryId = ref(0);
-  const parentCategory = ref({});
-  watch(parentCategoryId, async () => {
-    const res = await categoryService.getOne(parentCategoryId.value);
-    parentCategory.value = res.metadata;
-  });
   const images = ref([]);
   const variants = ref([]);
+
+  const selectedCategory = ref({});
+  watch(selectedCategory, async () => {
+    newProduct.value.categoryId = selectedCategory.value.id;
+  });
 
   const productSchema = yup.object().shape({
     // name: yup
@@ -46,8 +44,8 @@ const useProductStore = defineStore("product", () => {
     newProduct.value = payload;
   }
 
-  const setParentCategoryId = (payload) => {
-    parentCategoryId.value = payload;
+  const setSelectedCategory = (payload) => {
+    selectedCategory.value = payload;
   }
 
   const setImages = (payload) => {
@@ -93,12 +91,11 @@ const useProductStore = defineStore("product", () => {
   return {
     productSchema,
     newProduct,
-    parentCategory,
-    parentCategoryId,
+    selectedCategory,
     images,
     variants,
     setNewProduct,
-    setParentCategoryId,
+    setSelectedCategory,
     setImages,
     uploadImage,
     addProductImage,

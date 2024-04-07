@@ -1,6 +1,6 @@
 <script setup>
 // import CategoryTable from "@/components/category/CategoryTable.vue";
-import CategoryTableTemp from "@/components/category/CategoryTableTemp.vue";
+import CategoryTable from "@/components/category/CategoryTable.vue";
 import Breadcrumb from "@/components/common/Breadcrumb.vue";
 </script>
 <template>
@@ -13,5 +13,5 @@ import Breadcrumb from "@/components/common/Breadcrumb.vue";
       Thêm danh mục
     </router-link>
   </div>
-  <CategoryTableTemp />
+  <CategoryTable />
 </template>

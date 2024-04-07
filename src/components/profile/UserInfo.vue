@@ -174,7 +174,7 @@ async function handleUpdateAccountInfo(values) {
 function onClickDateInput() { }
 </script>
 
-<style>
+<style scoped>
 [type="radio"] {
   position: absolute;
   opacity: 0;
