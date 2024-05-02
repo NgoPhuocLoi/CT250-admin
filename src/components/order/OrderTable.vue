@@ -6,41 +6,10 @@ import { onMounted, ref } from "vue";
 import OrderStatus from "./OrderStatus.vue";
 import PaymentStatus from "./PaymentStatus.vue";
 
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Tag from 'primevue/tag';
-import Dropdown from 'primevue/dropdown';
-import InputText from 'primevue/inputtext';
-import InputNumber from 'primevue/inputnumber';
-import Button from 'primevue/button';
-import { FilterMatchMode } from 'primevue/api';
-
-import TableSkeleton from "@/components/skeleton/TableSkeleton.vue";
-
 const props = defineProps(["orders"]);
 const orderStatuses = ref([]);
 const paymentStatuses = ref([]);
 const fetchingOrders = ref(false);
-const filters = ref({});
-const selectedOrders = ref([]);
-
-const initFilters = () => {
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        id: { value: null, matchMode: FilterMatchMode.EQUALS },
-        createdAt: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        // rootCategory: { value: null, matchMode: FilterMatchMode.EQUALS },
-        // price: { value: null, matchMode: FilterMatchMode.EQUALS },
-        // quantity: { value: null, matchMode: FilterMatchMode.EQUALS },
-        // visibility: { value: null, matchMode: FilterMatchMode.EQUALS },
-    };
-};
-
-const clearFilter = () => {
-    initFilters();
-};
-
-initFilters();
 
 onMounted(async () => {
   await Promise.all([fetchAllOrderStatuses(), fetAllPaymentStatuses()]);
@@ -68,69 +37,7 @@ async function fetAllPaymentStatuses() {
 }
 </script>
 <template>
-
-  <div class="card">
-    <TableSkeleton :columnList="columnList" v-if="fetchingOrders" />
-    <DataTable v-else v-model:selection="selectedOrders" dataKey="id" stripedRows v-model:filters="filters"
-      :value="orders" filterDisplay="row" :loading="fetchingOrders"
-      :globalFilterFields="['id', 'status']" sortMode="multiple" paginator resizableColumns
-      columnResizeMode="fit"
-      paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
-      currentPageReportTemplate="{first} đến {last} trong tổng số {totalRecords}" :rows="5"
-      :rowsPerPageOptions="[5, 10, 15, 20]" tableStyle="min-width: 50rem">
-      <template #header>
-        <div class="flex justify-between">
-          <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined @click="clearFilter()" />
-          <span class="relative">
-            <i class="pi pi-search absolute top-2/4 -mt-2 left-3 text-surface-400 dark:text-surface-600" />
-            <InputText v-model="filters['global'].value" placeholder="Nhập từ khóa tìm kiếm..."
-              class="pl-10 font-normal" />
-          </span>
-        </div>
-      </template>
-      <template #empty> Không có đơn hàng nào. </template>
-      <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-      <Column field="id" header="Mã đơn hàng" sortable>
-        <template #body="slotProps">
-          <RouterLink :to="`/don-hang/${slotProps.data.id}`"
-            class="text-sm font-bold underline-offset-2 underline text-black mx-auto">
-            #{{ slotProps.data.id }}
-          </RouterLink>
-        </template>
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"
-            placeholder="Theo mã" />
-        </template>
-      </Column>
-      <Column header="Ngày đặt hàng">
-        <template #body="slotProps">
-          <img class="w-[6rem] shadow-md rounded" :src="slotProps.createdAt" />
-        </template>
-      </Column>
-      <Column field="name" header="Email khách hàng" sortable>
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"
-            placeholder="Tìm theo email khách hàng" />
-        </template>
-      </Column>
-      <!-- <Column field="rootCategory" header="Danh mục" sortable>
-        <template #filter="{ filterModel, filterCallback }">
-          <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="['Nam', 'Nữ', 'Trẻ em']"
-            placeholder="Chọn một" class="p-column-filter" :showClear="true">
-            <template #option="slotProps">
-              <Tag :value="slotProps.option"
-                :severity="slotProps.option === 'Nam' ? 'info' : slotProps.option === 'Nữ' ? 'danger' : 'warning'" />
-            </template>
-          </Dropdown>
-        </template>
-      </Column> -->
-    </DataTable>
-  </div>
-
-
-
-
-  <!-- <div class="rounded-sm border border-stroke bg-white shadow-default">
+  <div class="rounded-sm border border-stroke bg-white shadow-default">
     <div style="grid-template-columns: repeat(20, minmax(0, 1fr))" class="grid border-t border-stroke py-4.5 px-4">
       <div class="col-span-3 flex">
         <div class="flex items-center mt-8 mr-4">
@@ -182,7 +89,6 @@ async function fetAllPaymentStatuses() {
         </div>
       </div>
     </div>
-
     <div v-for="order in props.orders" :key="order.id">
       <div style="grid-template-columns: repeat(20, minmax(0, 1fr))" class="grid border-t border-stroke py-4.5 px-4">
         <div class="col-span-3">
@@ -231,5 +137,5 @@ async function fetAllPaymentStatuses() {
         </div>
       </div>
     </div>
-  </div> -->
+  </div>
 </template>
