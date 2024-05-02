@@ -9,6 +9,7 @@ import {
   OrderIcon,
   ProductCategoryIcon,
   ProductIcon,
+  UserIcon
 } from "../icons";
 
 const target = ref(null);
@@ -38,6 +39,11 @@ const menuGroups = ref([
         icon: ProductIcon,
         label: "Sản phẩm",
         route: "/san-pham",
+      },
+      {
+        icon: UserIcon,
+        label: "Người dùng",
+        route: "/nguoi-dung",
       },
       {
         icon: OrderIcon,

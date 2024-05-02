@@ -1,5 +1,5 @@
 <script setup>
-import ProductTable from "@/components/product//ProductTable.vue";
+import ProductTable from "@/components/product/ProductTable.vue";
 import Breadcrumb from "@/components/common/Breadcrumb.vue";
 </script>
 <template>

@@ -21,7 +21,6 @@ const childrenCategoryIds = ref([]);
 const fetchingProducts = ref(false);
 const filters = ref({});
 const selectedProducts = ref([]);
-const metaKey = ref(true);
 
 const initFilters = () => {
     filters.value = {

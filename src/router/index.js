@@ -1,6 +1,7 @@
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import CategoriesView from "@/views/category/CategoriesView.vue";
 import ProductsView from "@/views/product/ProductsView.vue";
+import UsersView from "@/views/user/UsersView.vue";
 import OrdersView from "@/views/order/OrdersView.vue";
 import OrderDetailView from "@/views/order/OrderDetailView.vue";
 import AddProductView from "@/views/product/AddProductView.vue";
@@ -64,6 +65,10 @@ const router = createRouter({
         {
           path: "san-pham",
           component: ProductsView,
+        },
+        {
+          path: "nguoi-dung",
+          component: UsersView,
         },
         {
           path: "san-pham/them",
