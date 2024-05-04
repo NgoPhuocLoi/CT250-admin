@@ -40,6 +40,27 @@ const authenticateUser = async (to, from) => {
   }
 };
 
+const authenticateAdmin = async (to, from) => {
+  const accessToken = localStorage["accesstoken"];
+
+  if (!accessToken) return { name: "Login" };
+
+  try {
+    loadingStore.startLoading();
+    const loggedInAccount = await authService.getLoggedInAccount(accessToken);
+    accountStore.setAccount(loggedInAccount.metadata);
+    if (loggedInAccount.metadata.roleId !== 1) {
+      return "/danh-muc-san-pham";
+    }
+    return true;
+  } catch (error) {
+    console.log(error);
+    return { name: "Login" };
+  } finally {
+    loadingStore.endLoading();
+  }
+};
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -57,6 +78,7 @@ const router = createRouter({
         {
           path: "",
           component: Dashboard,
+          beforeEnter: authenticateAdmin,
         },
         {
           path: "danh-muc-san-pham",
@@ -69,6 +91,7 @@ const router = createRouter({
         {
           path: "nguoi-dung",
           component: UsersView,
+          beforeEnter: authenticateAdmin,
         },
         {
           path: "san-pham/them",

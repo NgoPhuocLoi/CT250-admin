@@ -2,11 +2,11 @@ import createApiClient from "./api";
 
 class ProductService {
   constructor(baseUrl = "/api/products") {
-    this.api = createApiClient(baseUrl);
+    this.api = createApiClient(baseUrl, { needAuth: true });
   }
 
   async create(data) {
-    return (await this.api.post("/", data)).data; // name, price, description, material, overview, instruction, categoryId, (array) uploadedImageIds  
+    return (await this.api.post("/", data)).data; // name, price, description, material, overview, instruction, categoryId, (array) uploadedImageIds
   }
 
   // /products/:productId/variants
@@ -16,7 +16,7 @@ class ProductService {
   }
 
   async uploadImage(id, data) {
-    return (await this.api.post(`/${id}/add-image`, data)).data; // name, price, description, material, overview, instruction, categoryId, (array) uploadedImageIds  
+    return (await this.api.post(`/${id}/add-image`, data)).data; // name, price, description, material, overview, instruction, categoryId, (array) uploadedImageIds
   }
 
   async getAll() {

@@ -9,20 +9,27 @@ import {
   OrderIcon,
   ProductCategoryIcon,
   ProductIcon,
-  UserIcon
+  UserIcon,
 } from "../icons";
+import { useAccountStore } from "@/stores";
+import { onMounted } from "vue";
 
 const target = ref(null);
-
+const accountStore = useAccountStore();
 const sidebarStore = useSidebarStore();
+const isAdmin = ref(false);
 
 onClickOutside(target, () => {
   sidebarStore.isSidebarOpen = false;
 });
 
+onMounted(() => {
+  isAdmin.value = accountStore.account.roleId === 1;
+});
+
 const menuGroups = ref([
   {
-    name: "QUẢN LÝ",
+    name: "Quản lý của admin",
     menuItems: [
       {
         icon: DashBoardIcon,
@@ -30,6 +37,17 @@ const menuGroups = ref([
         route: "#",
         children: [{ label: "eCommerce", route: "/" }],
       },
+      {
+        icon: UserIcon,
+        label: "Người dùng",
+        route: "/nguoi-dung",
+      },
+    ],
+    roleIds: [1],
+  },
+  {
+    name: "Quản lý của nhân viên",
+    menuItems: [
       {
         icon: ProductCategoryIcon,
         label: "Danh mục sản phẩm",
@@ -39,11 +57,6 @@ const menuGroups = ref([
         icon: ProductIcon,
         label: "Sản phẩm",
         route: "/san-pham",
-      },
-      {
-        icon: UserIcon,
-        label: "Người dùng",
-        route: "/nguoi-dung",
       },
       {
         icon: OrderIcon,
@@ -56,6 +69,7 @@ const menuGroups = ref([
         route: "/ma-giam-gia",
       },
     ],
+    roleIds: [1, 2],
   },
 ]);
 </script>
@@ -104,18 +118,15 @@ const menuGroups = ref([
       <!-- Sidebar Menu -->
       <nav class="py-4 px-4 lg:px-6">
         <template v-for="menuGroup in menuGroups" :key="menuGroup.name">
-          <div>
+          <div v-if="menuGroup.roleIds.includes(accountStore.account.roleId)">
             <h3 class="mb-4 ml-4 text-sm font-medium text-bodydark2">
               {{ menuGroup.name }}
             </h3>
 
             <ul class="mb-6 flex flex-col gap-1.5">
-              <SidebarItem
-                v-for="(menuItem, index) in menuGroup.menuItems"
-                :item="menuItem"
-                :key="index"
-                :index="index"
-              />
+              <div v-for="(menuItem, index) in menuGroup.menuItems">
+                <SidebarItem :item="menuItem" :key="index" :index="index" />
+              </div>
             </ul>
           </div>
         </template>
